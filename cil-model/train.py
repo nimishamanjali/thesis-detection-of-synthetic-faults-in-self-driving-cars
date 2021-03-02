@@ -225,7 +225,7 @@ def main():
     argparser.add_argument(
         '-b', '--batch_size',
         dest='batch_size',
-        default=120,
+        default=64,
         help='Number of training examples utilised in one iteration')
     argparser.add_argument(
         '-e', '--epochs',
@@ -235,7 +235,7 @@ def main():
     argparser.add_argument(
         '-s', '--steps',
         dest='steps_per_epochs',
-        default=500,
+        default=30,
         help='Number of steps per epochs')
 
     args = argparser.parse_args()
