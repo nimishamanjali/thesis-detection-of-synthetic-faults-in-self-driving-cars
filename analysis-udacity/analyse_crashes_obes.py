@@ -7,10 +7,11 @@ import pandas as pd
 
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option("display.max_rows", None, "display.max_columns", None)
-pd.set_option('display.max_colwidth', -1)
+pd.set_option('display.max_colwidth', None)
 
-CRASHES_COUNT='#crashes'
-OBEs_COUNT='#OBEs'
+CRASHES_COUNT = '#crashes'
+OBEs_COUNT = '#OBEs'
+
 
 # Provide a list of mutants which do not have any crashes or OBEs
 def build_mutant_list_not_having_crashes_obes(whole_df):
@@ -19,7 +20,7 @@ def build_mutant_list_not_having_crashes_obes(whole_df):
     return df.loc[df['Neither/Nor'] == 'True', 'mutation'].tolist()
 
 
-# Provide a list of mutants which have crashes or OBEs in some of 20 models and report in how many models they are
+# Provide a list of mutants which have crashes or OBEs in some of 20 models and report count in how many models they are
 def build_mutant_list_having_crashes_obes_on_some_models(whole_df):
     df_crashes = (whole_df[(whole_df[CRASHES_COUNT] > 0)]).groupby('mutation')[[CRASHES_COUNT]].count().reset_index()
     df_obes = (whole_df[(whole_df[OBEs_COUNT] > 0)]).groupby('mutation')[[OBEs_COUNT]].count().reset_index()
@@ -69,6 +70,7 @@ if __name__ == "__main__":
         raise FileNotFoundError("Insert the correct path to the tensorflow directory")
 
     df = extract_data(sys.argv[1])
+    #print(df)
     pprint(build_mutant_list_not_having_crashes_obes(df))
     pprint(build_mutant_list_having_crashes_obes_on_some_models(df))
     pprint(build_mutant_list_having_crashes_obes_on_all_models(df))
