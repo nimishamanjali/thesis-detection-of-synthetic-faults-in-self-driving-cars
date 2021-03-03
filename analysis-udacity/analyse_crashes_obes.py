@@ -67,7 +67,7 @@ def extract_data(path):
 
 if __name__ == "__main__":
     if len(sys.argv) < 1:
-        raise FileNotFoundError("Insert the correct path to the tensorflow directory")
+        raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
     df = extract_data(sys.argv[1])
     #print(df)
