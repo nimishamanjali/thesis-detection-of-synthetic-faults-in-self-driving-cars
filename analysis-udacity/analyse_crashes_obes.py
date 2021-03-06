@@ -40,7 +40,7 @@ def build_mutant_list_having_crashes_obes_on_all_models(whole_df):
     return df.loc[df['result'] == 'True', 'mutation'].tolist()
 
 
-def extract_data(path):
+def extract_crashes_obes_data(path):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
         dirs[:] = [d for d in dirs if not d.startswith('udacity_original')]
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 1:
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
-    df = extract_data(sys.argv[1])
+    df = extract_crashes_obes_data(sys.argv[1])
     #print(df)
     pprint(build_mutant_list_not_having_crashes_obes(df))
     pprint(build_mutant_list_having_crashes_obes_on_some_models(df))
