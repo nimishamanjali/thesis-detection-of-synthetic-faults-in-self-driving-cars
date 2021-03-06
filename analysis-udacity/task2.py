@@ -15,6 +15,8 @@ MEAN_LP = 'Mean(LP)'
 STD_SA = 'Std(SA)'
 
 
+# given list of mutants with no crashes or obes ,
+#  it extracts the metrics mean_LP,std_sa,std_speed of those mutant models to a dataframe
 def extract_data_based_on_no_crashes_obes_list(path, no_crashes_obes_list):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
@@ -42,6 +44,7 @@ def extract_data_based_on_no_crashes_obes_list(path, no_crashes_obes_list):
          })
 
 
+# extract and save the original model data to a dataframe
 def extract_original_model_data(path):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
@@ -69,6 +72,7 @@ def extract_original_model_data(path):
          })
 
 
+# perform statistical def of killing comparing each 20 mutant version to each 20 original model
 def compute_table_for_metric(org, x, metric):
     data = is_diff_sts(x[metric].tolist(), org[metric].tolist())
     return 'killed: ' + str(data[0]) + '; p_value: ' + str(round(data[1], 3)) + '; effect_size: ' + str(
@@ -92,6 +96,7 @@ if __name__ == "__main__":
     std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
         lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
         name='STD_SPEED')
+
     table_meanlp_stdsa_stdspeed = mean_lp_stat_table.merge(std_sa_stat_table, on='mutation').merge(std_speed_stat_table,
                                                                                                    on='mutation')
     print(table_meanlp_stdsa_stdspeed)

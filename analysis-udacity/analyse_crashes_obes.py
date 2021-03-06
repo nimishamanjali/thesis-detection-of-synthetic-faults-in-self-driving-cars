@@ -29,17 +29,19 @@ def build_mutant_list_having_crashes_obes_on_some_models(whole_df):
     return merged_df.astype({CRASHES_COUNT: 'int64', OBEs_COUNT: 'int64'})
 
 
-def f(x):
+# check if crashes or obes count for all 20 models are greater than zero
+def check_count_for_all_20_models(x):
     val = all(np.where((x[CRASHES_COUNT] > 0) | (x[OBEs_COUNT] > 0), True, False))
     return str(val)
 
 
 # Provide a list of mutants which have crashes or OBEs on all 20 models
 def build_mutant_list_having_crashes_obes_on_all_models(whole_df):
-    df = whole_df.groupby(by=['mutation']).apply(lambda x: f(x)).reset_index(name='result')
+    df = whole_df.groupby(by=['mutation']).apply(lambda x: check_count_for_all_20_models(x)).reset_index(name='result')
     return df.loc[df['result'] == 'True', 'mutation'].tolist()
 
 
+# returns a df consisting crashes and obes data for all mutant models
 def extract_crashes_obes_data(path):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
@@ -70,7 +72,6 @@ if __name__ == "__main__":
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
     df = extract_crashes_obes_data(sys.argv[1])
-    #print(df)
     pprint(build_mutant_list_not_having_crashes_obes(df))
     pprint(build_mutant_list_having_crashes_obes_on_some_models(df))
-    pprint(build_mutant_list_having_crashes_obes_on_all_models(df))
+    pprint(build_mutant_list_having_crashes_obes_on_all_models(df))  # mutants killed
