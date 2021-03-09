@@ -5,7 +5,7 @@ import pandas as pd
 
 from analyse_crashes_obes import extract_crashes_obes_data, build_mutant_list_not_having_crashes_obes
 from stats import is_diff_sts
-
+from pprint import pprint
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 pd.set_option('display.max_colwidth', None)
@@ -32,9 +32,9 @@ def extract_data_based_on_no_crashes_obes_list(path, no_crashes_obes_list):
     for i in filenames:
         filtered_csv = pd.read_csv(i, usecols=[MEAN_LP, STD_SA, STD_SPEED])
         filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-        mean_lp.append((filtered_csv.sum(axis=0)[MEAN_LP]))
-        std_sa.append((filtered_csv.sum(axis=0)[STD_SA]))
-        std_speed.append((filtered_csv.sum(axis=0)[STD_SPEED]))
+        mean_lp.append((filtered_csv[MEAN_LP].tolist()))
+        std_sa.append((filtered_csv[STD_SA].tolist()))
+        std_speed.append((filtered_csv[STD_SPEED].tolist()))
 
     return pd.DataFrame(
         {'mutation': filename,
@@ -60,9 +60,9 @@ def extract_original_model_data(path):
     for i in filenames:
         filtered_csv = pd.read_csv(i, usecols=[MEAN_LP, STD_SA, STD_SPEED])
         filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-        mean_lp.append((filtered_csv.sum(axis=0)[MEAN_LP]))
-        std_sa.append((filtered_csv.sum(axis=0)[STD_SA]))
-        std_speed.append((filtered_csv.sum(axis=0)[STD_SPEED]))
+        mean_lp.append((filtered_csv[MEAN_LP].tolist()))
+        std_sa.append((filtered_csv[STD_SA].tolist()))
+        std_speed.append((filtered_csv[STD_SPEED].tolist()))
 
     return pd.DataFrame(
         {'mutation': filename,
@@ -74,9 +74,25 @@ def extract_original_model_data(path):
 
 # perform statistical def of killing comparing each 20 mutant version to each 20 original model
 def compute_table_for_metric(org, x, metric):
-    data = is_diff_sts(x[metric].tolist(), org[metric].tolist())
-    return 'killed: ' + str(data[0]) + '; p_value: ' + str(round(data[1], 3)) + '; effect_size: ' + str(
-        round(data[2], 3))
+    killed = None
+    if len(x[metric]) == 20:
+        mutant_list = x[metric].tolist()
+        org_list = org[metric].tolist()
+
+        for i in range(0, 19):
+            data = is_diff_sts(org_list[i], mutant_list[i])
+            if data[0]:
+                killed = 'killed: ' + str(data[0]) + '; p_value: ' + str(round(data[1], 3)) + '; effect_size: ' + str(
+                    round(data[2], 3))
+                break
+    return str(killed) if killed is not None else 'killed: false'
+
+
+def extract_killed_mutants(df):
+    mutant_list = [(df.loc[df[MEAN_LP] != 'killed: false']['mutation'].tolist()),
+                   (df.loc[df[STD_SA] != 'killed: false']['mutation'].tolist()),
+                   (df.loc[df[STD_SPEED] != 'killed: false']['mutation'].tolist())]
+    return list(set([item for sublist in mutant_list for item in sublist]))
 
 
 if __name__ == "__main__":
@@ -87,6 +103,7 @@ if __name__ == "__main__":
     no_crashes_obes_list = build_mutant_list_not_having_crashes_obes(df_crashes_obes)
     df = extract_data_based_on_no_crashes_obes_list(sys.argv[1], no_crashes_obes_list)
     org_model_data = extract_original_model_data(sys.argv[1])
+
     mean_lp_stat_table = (df.groupby(by=['mutation'])).apply(
         lambda x: compute_table_for_metric(org_model_data, x, MEAN_LP)).reset_index(
         name=MEAN_LP)
@@ -95,8 +112,9 @@ if __name__ == "__main__":
         name=STD_SA)
     std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
         lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
-        name='STD_SPEED')
+        name=STD_SPEED)
 
     table_meanlp_stdsa_stdspeed = mean_lp_stat_table.merge(std_sa_stat_table, on='mutation').merge(std_speed_stat_table,
                                                                                                    on='mutation')
-    print(table_meanlp_stdsa_stdspeed)
+    print('mutants killed by metrics : Mean(LP), Std(Speed), Std(SA)')
+    pprint(extract_killed_mutants(table_meanlp_stdsa_stdspeed))
