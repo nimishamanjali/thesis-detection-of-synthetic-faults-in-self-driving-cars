@@ -1,11 +1,13 @@
 import os
 import sys
+from pprint import pprint
 
 import pandas as pd
 
-from analyse_crashes_obes import extract_crashes_obes_data, build_mutant_list_not_having_crashes_obes
+from analyse_crashes_obes import extract_crashes_obes_data, build_mutant_list_not_having_crashes_obes, \
+    build_mutant_list_having_crashes_obes_on_some_models
 from stats import is_diff_sts
-from pprint import pprint
+
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 pd.set_option('display.max_colwidth', None)
@@ -17,7 +19,7 @@ STD_SA = 'Std(SA)'
 
 # given list of mutants with no crashes or obes ,
 #  it extracts the metrics mean_LP,std_sa,std_speed of those mutant models to a dataframe
-def extract_data_based_on_no_crashes_obes_list(path, no_crashes_obes_list):
+def extract_data_based_given_mutant_list(path, no_crashes_obes_list):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
         dirs[:] = [d for d in dirs if d.startswith(tuple(no_crashes_obes_list))]
@@ -78,7 +80,6 @@ def compute_table_for_metric(org, x, metric):
     if len(x[metric]) == 20:
         mutant_list = x[metric].tolist()
         org_list = org[metric].tolist()
-
         for i in range(0, 19):
             data = is_diff_sts(org_list[i], mutant_list[i])
             if data[0]:
@@ -88,11 +89,26 @@ def compute_table_for_metric(org, x, metric):
     return str(killed) if killed is not None else 'killed: false'
 
 
-def extract_killed_mutants(df):
+def filter_killed_mutants(df):
     mutant_list = [(df.loc[df[MEAN_LP] != 'killed: false']['mutation'].tolist()),
                    (df.loc[df[STD_SA] != 'killed: false']['mutation'].tolist()),
                    (df.loc[df[STD_SPEED] != 'killed: false']['mutation'].tolist())]
     return list(set([item for sublist in mutant_list for item in sublist]))
+
+
+def compute_and_merge_metric_mutant_tables(df, org_model_data):
+    mean_lp_stat_table = (df.groupby(by=['mutation'])).apply(
+        lambda x: compute_table_for_metric(org_model_data, x, MEAN_LP)).reset_index(
+        name=MEAN_LP)
+
+    std_sa_stat_table = (df.groupby(by=['mutation'])).apply(
+        lambda x: compute_table_for_metric(org_model_data, x, STD_SA)).reset_index(
+        name=STD_SA)
+    std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
+        lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
+        name=STD_SPEED)
+    return mean_lp_stat_table.merge(std_sa_stat_table, on='mutation').merge(std_speed_stat_table,
+                                                                            on='mutation')
 
 
 if __name__ == "__main__":
@@ -100,21 +116,21 @@ if __name__ == "__main__":
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
     df_crashes_obes = extract_crashes_obes_data(sys.argv[1])
-    no_crashes_obes_list = build_mutant_list_not_having_crashes_obes(df_crashes_obes)
-    df = extract_data_based_on_no_crashes_obes_list(sys.argv[1], no_crashes_obes_list)
     org_model_data = extract_original_model_data(sys.argv[1])
 
-    mean_lp_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, MEAN_LP)).reset_index(
-        name=MEAN_LP)
-    std_sa_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, STD_SA)).reset_index(
-        name=STD_SA)
-    std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
-        name=STD_SPEED)
+    no_crashes_obes_list = build_mutant_list_not_having_crashes_obes(df_crashes_obes)
+    df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list)
+    table_mutants_killed_for_no_crashes_obes = compute_and_merge_metric_mutant_tables(df_no_crashes_obes,
+                                                                                      org_model_data)
+    print(
+        'mutants killed by metrics : Mean(LP), Std(Speed), Std(SA) from mutant list not having crashes or obes_________')
+    pprint(filter_killed_mutants(table_mutants_killed_for_no_crashes_obes))
 
-    table_meanlp_stdsa_stdspeed = mean_lp_stat_table.merge(std_sa_stat_table, on='mutation').merge(std_speed_stat_table,
-                                                                                                   on='mutation')
-    print('mutants killed by metrics : Mean(LP), Std(Speed), Std(SA)')
-    pprint(extract_killed_mutants(table_meanlp_stdsa_stdspeed))
+    some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
+    df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
+                                                                some_crashes_obes_list['mutation'].tolist())
+    table_mutants_killed_for_some_crashes_obes = compute_and_merge_metric_mutant_tables(df_some_crashes_obes,
+                                                                                        org_model_data)
+    print(
+        'mutants killed by metrics : Mean(LP), Std(Speed), Std(SA) from mutant list having some crashes or obes_________')
+    pprint(filter_killed_mutants(table_mutants_killed_for_some_crashes_obes))
