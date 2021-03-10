@@ -134,25 +134,13 @@ def filter_killed_mutants(df, metric):
 
 
 def compute_and_merge_metric_mutant_tables(df, org_model_data):
-    mean_lp_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, MEAN_LP)).reset_index(
-        name=MEAN_LP)
-
-    std_sa_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, STD_SA)).reset_index(
-        name=STD_SA)
-    std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
-        name=STD_SPEED)
-    max_lp_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, MAX_LP)).reset_index(
-        name=MAX_LP)
-
-    max_acc_stat_table = (df.groupby(by=['mutation'])).apply(
-        lambda x: compute_table_for_metric(org_model_data, x, MAX_ACC)).reset_index(
-        name=MAX_ACC)
+    dfs = []
+    for i in metrics:
+        dfs.append((df.groupby(by=['mutation'])).apply(
+            lambda x: compute_table_for_metric(org_model_data, x, i)).reset_index(
+            name=i))
     return reduce(lambda left, right: pd.merge(left, right, on=['mutation']),
-                  [mean_lp_stat_table, std_sa_stat_table, std_speed_stat_table, max_lp_stat_table, max_acc_stat_table])
+                  dfs)
 
 
 if __name__ == "__main__":
@@ -169,7 +157,7 @@ if __name__ == "__main__":
     print(
         'mutants killed by metrics from mutant list not having crashes or obes_________')
 
-    (print_killed_mutants(table_mutants_for_no_crashes_obes))
+    print_killed_mutants(table_mutants_for_no_crashes_obes)
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
@@ -178,4 +166,4 @@ if __name__ == "__main__":
                                                                                  org_model_data)
     print(
         '\n mutants killed by metrics from mutant list having some crashes or obes_________')
-    (print_killed_mutants(table_mutants_for_some_crashes_obes))
+    print_killed_mutants(table_mutants_for_some_crashes_obes)
