@@ -16,7 +16,10 @@ pd.set_option('display.max_colwidth', None)
 STD_SPEED = 'Std(Speed)'
 MEAN_LP = 'Mean(LP)'
 STD_SA = 'Std(SA)'
-metrics = [MEAN_LP, STD_SPEED, STD_SA]
+MAX_LP = 'Max(LP)'
+# STD_BRAKE = 'Std(Brake)'
+MAX_ACC = 'Max(Acc)'
+metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC]
 
 
 # given list of mutants with no crashes or obes ,
@@ -33,18 +36,24 @@ def extract_data_based_given_mutant_list(path, no_crashes_obes_list):
     mean_lp = []
     std_sa = []
     std_speed = []
+    max_lp = []
+    max_acc = []
     for i in filenames:
-        filtered_csv = pd.read_csv(i, usecols=[MEAN_LP, STD_SA, STD_SPEED])
+        filtered_csv = pd.read_csv(i, usecols=metrics)
         filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
         mean_lp.append((filtered_csv[MEAN_LP].tolist()))
         std_sa.append((filtered_csv[STD_SA].tolist()))
         std_speed.append((filtered_csv[STD_SPEED].tolist()))
+        max_lp.append(filtered_csv[MAX_LP].tolist())
+        max_acc.append(filtered_csv[MAX_ACC].tolist())
 
     return pd.DataFrame(
         {'mutation': filename,
          MEAN_LP: mean_lp,
          STD_SA: std_sa,
-         STD_SPEED: std_speed
+         STD_SPEED: std_speed,
+         MAX_LP: max_lp,
+         MAX_ACC: max_acc
          })
 
 
@@ -61,18 +70,26 @@ def extract_original_model_data(path):
     mean_lp = []
     std_sa = []
     std_speed = []
+    max_lp = []
+    max_acc = []
+
     for i in filenames:
-        filtered_csv = pd.read_csv(i, usecols=[MEAN_LP, STD_SA, STD_SPEED])
+        filtered_csv = pd.read_csv(i, usecols=metrics)
         filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-        mean_lp.append((filtered_csv[MEAN_LP].tolist()))
-        std_sa.append((filtered_csv[STD_SA].tolist()))
-        std_speed.append((filtered_csv[STD_SPEED].tolist()))
+        mean_lp.append(filtered_csv[MEAN_LP].tolist())
+        std_sa.append(filtered_csv[STD_SA].tolist())
+        std_speed.append(filtered_csv[STD_SPEED].tolist())
+        max_lp.append(filtered_csv[MAX_LP].tolist())
+
+        max_acc.append(filtered_csv[MAX_ACC].tolist())
 
     return pd.DataFrame(
         {'mutation': filename,
          MEAN_LP: mean_lp,
          STD_SA: std_sa,
-         STD_SPEED: std_speed
+         STD_SPEED: std_speed,
+         MAX_LP: max_lp,
+         MAX_ACC: max_acc
          })
 
 
@@ -92,10 +109,11 @@ def compute_table_for_metric(org, x, metric):
         org_list = org[metric].tolist()
         for i in range(0, 27):
             if remove_this_func_later(mutant_list, i):
+
                 data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list])
+
                 if data[0]:
                     killed = 'killed: ' + str(data[0]) + ',' + 'Sector number: ' + str(i)
-
                     break
 
     return tuple(killed.split(",")) if killed is not None else 'killed: false'
@@ -126,8 +144,15 @@ def compute_and_merge_metric_mutant_tables(df, org_model_data):
     std_speed_stat_table = (df.groupby(by=['mutation'])).apply(
         lambda x: compute_table_for_metric(org_model_data, x, STD_SPEED)).reset_index(
         name=STD_SPEED)
-    return mean_lp_stat_table.merge(std_sa_stat_table, on='mutation').merge(std_speed_stat_table,
-                                                                            on='mutation')
+    max_lp_stat_table = (df.groupby(by=['mutation'])).apply(
+        lambda x: compute_table_for_metric(org_model_data, x, MAX_LP)).reset_index(
+        name=MAX_LP)
+
+    max_acc_stat_table = (df.groupby(by=['mutation'])).apply(
+        lambda x: compute_table_for_metric(org_model_data, x, MAX_ACC)).reset_index(
+        name=MAX_ACC)
+    return reduce(lambda left, right: pd.merge(left, right, on=['mutation']),
+                  [mean_lp_stat_table, std_sa_stat_table, std_speed_stat_table, max_lp_stat_table, max_acc_stat_table])
 
 
 if __name__ == "__main__":
