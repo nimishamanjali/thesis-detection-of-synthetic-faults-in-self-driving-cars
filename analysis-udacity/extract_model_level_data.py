@@ -54,11 +54,11 @@ def extract_data_from_csv(path):
             tmp = pd.read_csv(i, header=None)
             if not tmp.empty:
                 for index, row in tmp.iterrows():
-                    exs_search_files.append(model_name + '_mutated0_MP_' + str(row[0]) + ' ' + str(row[3]))
+                    exs_search_files.append(model_name + str(row[0]) + ' ' + str(row[3]))
 
         if i.endswith('_nosearch.csv'):
             tmp = pd.read_csv(i, header=None)
-            no_search_files.append(model_name + '_mutated0_MP' + ' ' + str(tmp.iloc[0, -1]))
+            no_search_files.append(model_name[:-1] + ' ' + str(tmp.iloc[0, -1]))
 
     final_list = binary_search_files + exs_search_files + no_search_files
     tuple_list = [make_tuple_from_string(element) for element in final_list]
