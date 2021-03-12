@@ -13,6 +13,10 @@ def make_tuple_from_string(str):
     return tuple(str.split(' '))
 
 
+def remove_if_nan(lst):
+    return [i for i in lst if 'nan' not in i]
+
+
 # 7.96
 def extract_data_from_csv(path):
     binary_search_files = []
@@ -35,14 +39,16 @@ def extract_data_from_csv(path):
             model_name = model_name + '_mutated0_MP_'
 
         if i.endswith('_binarysearch.csv'):
+
             tmp = pd.read_csv(i, header=None)
             if not tmp.empty:
                 binary_search_files.append(model_name + str(
-                    tmp.iloc[0, 1]) + ' ' + str(tmp.iloc[0, 5]))
+                    '%g' % (tmp.iloc[0, 1])) + ' ' + str((tmp.iloc[0, 5])))
+
                 for index, row in tmp.iterrows():
                     if index != 0:
                         binary_search_files.append(model_name + str(
-                            row[2]) + ' ' + str(row[5]))
+                            '%g' % (row[2])) + ' ' + str(row[5]))
 
         if i.endswith('_exssearch.csv'):
             tmp = pd.read_csv(i, header=None)
@@ -55,11 +61,12 @@ def extract_data_from_csv(path):
             no_search_files.append(model_name + '_mutated0_MP' + ' ' + str(tmp.iloc[0, -1]))
 
     final_list = binary_search_files + exs_search_files + no_search_files
-    return [make_tuple_from_string(element) for element in final_list]
+    tuple_list = [make_tuple_from_string(element) for element in final_list]
+    return remove_if_nan(tuple_list)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 1:
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
-    pprint(extract_data_from_csv(sys.argv[1]))
+    pprint((extract_data_from_csv(sys.argv[1])))
