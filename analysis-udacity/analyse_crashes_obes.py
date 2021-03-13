@@ -1,6 +1,5 @@
 import os
 import sys
-from pprint import pprint
 
 import numpy as np
 import pandas as pd
@@ -17,7 +16,7 @@ OBEs_COUNT = '#OBEs'
 def build_mutant_list_not_having_crashes_obes(whole_df):
     df = whole_df.groupby(by=['mutation'])[[CRASHES_COUNT, OBEs_COUNT]].sum().reset_index()
     df['Neither/Nor'] = np.where((df[CRASHES_COUNT] > 0) | (df[OBEs_COUNT] > 0), "False", "True")
-    return df.loc[df['Neither/Nor'] == 'True', 'mutation'].tolist()
+    return df.loc[df['Neither/Nor'] == 'True', 'mutation'].reset_index(drop=True)
 
 
 # Provide a list of mutants which have crashes or OBEs in some of 20 models and report count in how many models they are
@@ -38,7 +37,7 @@ def check_count_for_all_20_models(x):
 # Provide a list of mutants which have crashes or OBEs on all 20 models
 def build_mutant_list_having_crashes_obes_on_all_models(whole_df):
     df = whole_df.groupby(by=['mutation']).apply(lambda x: check_count_for_all_20_models(x)).reset_index(name='result')
-    return df.loc[df['result'] == 'True', 'mutation'].tolist()
+    return df.loc[df['result'] == 'True', 'mutation'].reset_index(drop=True).to_frame()
 
 
 # returns a df consisting crashes and obes data for all mutant models
@@ -67,11 +66,20 @@ def extract_crashes_obes_data(path):
          })
 
 
+def filter_some_from_all(df1, df2):
+    return df2[~df2['mutation'].isin(df1['mutation'].tolist())].reset_index(drop=True)
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 1:
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
 
     df = extract_crashes_obes_data(sys.argv[1])
-    pprint(build_mutant_list_not_having_crashes_obes(df))
-    pprint(build_mutant_list_having_crashes_obes_on_some_models(df))
-    pprint(build_mutant_list_having_crashes_obes_on_all_models(df))  # mutants killed
+    build_mutant_list_not_having_crashes_obes(df).to_csv('mutant_list_not_having_crashes_obes.csv')
+
+    mutant_lst_with_crashes_or_obes_on_all_model = build_mutant_list_having_crashes_obes_on_all_models(
+        df)  # mutants killed
+    mutant_lst_with_crashes_or_obes_on_all_model.to_csv('mutant_list_having_crashes_or_obes_on_all_models.csv')
+
+    mutant_lst_with_crashes_or_obes_on_some_and_all_model = build_mutant_list_having_crashes_obes_on_some_models(df)
+    filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model, mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv('mutant_list_having_crashes_or_obes_on_some_models.csv')
