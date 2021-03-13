@@ -19,7 +19,28 @@ STD_SA = 'Std(SA)'
 MAX_LP = 'Max(LP)'
 # STD_BRAKE = 'Std(Brake)'
 MAX_ACC = 'Max(Acc)'
-metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC]
+MAX_SA = 'Max(SA)'
+Mean_SA = 'Mean(SA)'
+Mean_SAS = 'Mean(SAS)'
+Std_SAS = 'Std(SAS)'
+Mean_LS = 'Mean(LS)'
+Std_LS = 'Std(LS)'
+Min_LP = 'Min(LP)'
+# Max_LP='Max(LP)'
+STD_LP = 'Std(LP)'
+# Min_Speed='Min(Speed)'
+Max_Speed = 'Max(Speed)'
+Mean_Acc = 'Mean(Acc)'
+Min_Acc = 'Min(Acc)'
+Std_Acc = 'Std(Acc)'
+Mean_TPP = 'Mean(TPP)'
+Std_TPP = 'Std(TPP)'
+# Mean_Brake = 'Mean(Brake)'
+# Count_Braking = 'Count(Braking)'
+
+metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
+           STD_LP, Max_Speed,
+           Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
 
 
 # given list of mutants with no crashes or obes ,
@@ -32,29 +53,20 @@ def extract_data_based_given_mutant_list(path, no_crashes_obes_list):
             if file.endswith("driving_log_output.csv"):
                 filenames.append(os.path.join(root, file))
 
-    filename = []
-    mean_lp = []
-    std_sa = []
-    std_speed = []
-    max_lp = []
-    max_acc = []
+    full_list = []
     for i in filenames:
+        cols = ['mutation'] + metrics
+        tmp_df = pd.DataFrame(columns=cols)
         filtered_csv = pd.read_csv(i, usecols=metrics)
-        filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-        mean_lp.append((filtered_csv[MEAN_LP].tolist()))
-        std_sa.append((filtered_csv[STD_SA].tolist()))
-        std_speed.append((filtered_csv[STD_SPEED].tolist()))
-        max_lp.append(filtered_csv[MAX_LP].tolist())
-        max_acc.append(filtered_csv[MAX_ACC].tolist())
 
-    return pd.DataFrame(
-        {'mutation': filename,
-         MEAN_LP: mean_lp,
-         STD_SA: std_sa,
-         STD_SPEED: std_speed,
-         MAX_LP: max_lp,
-         MAX_ACC: max_acc
-         })
+        tmp_df.at[0, 'mutation'] = '_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1])
+        for j in metrics:
+            tmp_df.at[0, j] = np.array(filtered_csv[j].tolist())
+
+        full_list.append(tmp_df)
+
+    main_df = pd.concat(full_list)
+    return main_df.reset_index(drop=True)
 
 
 # extract and save the original model data to a dataframe
@@ -66,31 +78,20 @@ def extract_original_model_data(path):
             if file.endswith("driving_log_output.csv"):
                 filenames.append(os.path.join(root, file))
 
-    filename = []
-    mean_lp = []
-    std_sa = []
-    std_speed = []
-    max_lp = []
-    max_acc = []
-
+    full_list = []
     for i in filenames:
+        cols = ['mutation'] + metrics
+        tmp_df = pd.DataFrame(columns=cols)
         filtered_csv = pd.read_csv(i, usecols=metrics)
-        filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-        mean_lp.append(filtered_csv[MEAN_LP].tolist())
-        std_sa.append(filtered_csv[STD_SA].tolist())
-        std_speed.append(filtered_csv[STD_SPEED].tolist())
-        max_lp.append(filtered_csv[MAX_LP].tolist())
+        tmp_df.at[0, 'mutation'] = '_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1])
 
-        max_acc.append(filtered_csv[MAX_ACC].tolist())
+        for j in metrics:
+            tmp_df.at[0, j] = np.array(filtered_csv[j].tolist())
 
-    return pd.DataFrame(
-        {'mutation': filename,
-         MEAN_LP: mean_lp,
-         STD_SA: std_sa,
-         STD_SPEED: std_speed,
-         MAX_LP: max_lp,
-         MAX_ACC: max_acc
-         })
+        full_list.append(tmp_df)
+
+    main_df = pd.concat(full_list)
+    return main_df.reset_index(drop=True)
 
 
 def remove_this_func_later(a, i):
