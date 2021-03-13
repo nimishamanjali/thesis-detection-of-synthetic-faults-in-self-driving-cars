@@ -119,18 +119,15 @@ def compute_table_for_metric(org, x, metric):
     return tuple(killed.split(",")) if killed is not None else 'killed: false'
 
 
-def print_killed_mutants(df):
+def filter_killed_mutants(df):
     merged = []
     for i in metrics:
-        killed_mutants = filter_killed_mutants(df, i)
+        killed_mutants = df.loc[df[i] != 'killed: false'][['mutation', i]]
+
         merged.append(killed_mutants)
-    print(reduce(lambda df1, df2: pd.merge(df1, df2, on='mutation', how='outer'), merged).replace(np.nan,
-                                                                                                  'Not killed by this metric',
-                                                                                                  regex=True))
-
-
-def filter_killed_mutants(df, metric):
-    return df.loc[df[metric] != 'killed: false'][['mutation', metric]]
+    return reduce(lambda df1, df2: pd.merge(df1, df2, on='mutation', how='outer'), merged).replace(np.nan,
+                                                                                                   'Not killed by this metric',
+                                                                                                   regex=True)
 
 
 def compute_and_merge_metric_mutant_tables(df, org_model_data):
@@ -141,6 +138,14 @@ def compute_and_merge_metric_mutant_tables(df, org_model_data):
             name=i))
     return reduce(lambda left, right: pd.merge(left, right, on=['mutation']),
                   dfs)
+
+
+def get_metrics_info(table_mutants_for_no_crashes_obes):
+    lst = []
+    for i in metrics:
+        lst.append((i, len(
+            table_mutants_for_no_crashes_obes[(table_mutants_for_no_crashes_obes[i] != 'Not killed by this metric')])))
+    return lst
 
 
 if __name__ == "__main__":
@@ -157,7 +162,9 @@ if __name__ == "__main__":
     print(
         'mutants killed by metrics from mutant list not having crashes or obes_________')
 
-    print_killed_mutants(table_mutants_for_no_crashes_obes)
+    killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
+    print(killed_mutants_for_no_crashes_obes)
+    print(get_metrics_info(killed_mutants_for_no_crashes_obes))
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
@@ -166,4 +173,6 @@ if __name__ == "__main__":
                                                                                  org_model_data)
     print(
         '\n mutants killed by metrics from mutant list having some crashes or obes_________')
-    print_killed_mutants(table_mutants_for_some_crashes_obes)
+    killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
+    print(killed_mutants_for_some_crashes_obes)
+    print(get_metrics_info(killed_mutants_for_some_crashes_obes))
