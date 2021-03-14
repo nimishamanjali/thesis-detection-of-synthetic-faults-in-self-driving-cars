@@ -147,7 +147,11 @@ def get_metrics_info(table_mutants_for_no_crashes_obes):
     for i in metrics:
         lst.append((i, len(
             table_mutants_for_no_crashes_obes[(table_mutants_for_no_crashes_obes[i] != 'Not killed by this metric')])))
-    return lst
+    main_df = []
+    for i in lst:
+        main_df.append({'Metric': i[0], '#mutants killed': i[1]})
+
+    return pd.DataFrame.from_dict(main_df).sort_values(by='#mutants killed', ascending=False).reset_index(drop=True)
 
 
 def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
@@ -162,6 +166,25 @@ def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
     return pd.DataFrame({'Mutant': mutant_lst,
                          'Metrics killed': metric_lst
                          })
+
+
+def make_table_of_mutants_and_metrics_killed_them(lst, df):
+    main_df = []
+    for i in lst:
+        data = {}
+        tmp_df = df.loc[df['Mutant'] == i]
+        if not tmp_df.empty:
+            data['Mutant'] = i
+            data['killed atleast by one metric'] = 'Yes'
+            data['Metrics killed it'] = tmp_df.iloc[0]['Metrics killed']
+        else:
+            data['Mutant'] = i
+            data['killed atleast by one metric'] = 'No'
+            data['Metrics killed it'] = []
+
+        main_df.append(data)
+
+    return pd.DataFrame.from_dict(main_df)
 
 
 if __name__ == "__main__":
@@ -180,7 +203,7 @@ if __name__ == "__main__":
 
     killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
     # print(killed_mutants_for_no_crashes_obes)
-    # print(get_metrics_info(killed_mutants_for_no_crashes_obes))
+    print(get_metrics_info(killed_mutants_for_no_crashes_obes))
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
@@ -191,8 +214,9 @@ if __name__ == "__main__":
     #    '\n mutants killed by metrics from mutant list having some crashes or obes_________')
     killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
     # print(killed_mutants_for_some_crashes_obes)
-    # print(get_metrics_info(killed_mutants_for_some_crashes_obes))
+    print(get_metrics_info(killed_mutants_for_some_crashes_obes))
 
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
-    print(df_a.append(df_b).reset_index(drop=True))
+    print(make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a))
+    print(make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b))
