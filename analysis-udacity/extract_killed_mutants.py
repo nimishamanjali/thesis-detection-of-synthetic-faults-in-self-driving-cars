@@ -37,9 +37,11 @@ Std_TPP = 'Std(TPP)'
 # Mean_Brake = 'Mean(Brake)'
 # Count_Braking = 'Count(Braking)'
 
-metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
-           STD_LP, Max_Speed,
-           Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+# metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
+#          STD_LP, Max_Speed,
+#         Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+
+metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP]
 
 
 # given list of mutants with no crashes or obes ,
@@ -148,6 +150,20 @@ def get_metrics_info(table_mutants_for_no_crashes_obes):
     return lst
 
 
+def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
+    metrics_killed = ((killed_mutants_for_no_crashes_obes.apply(
+        lambda row: (row[row != 'Not killed by this metric'].index, row[0]), axis=1)).to_frame(name='metrics_killed'))
+    metric_lst = []
+    mutant_lst = []
+    for index, row in metrics_killed.iterrows():
+        mutant_lst.append(row[0][1])
+        metric_lst.append(row[0][0].tolist()[1:])
+
+    return pd.DataFrame({'Mutant': mutant_lst,
+                         'Metrics killed': metric_lst
+                         })
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 1:
         raise FileNotFoundError("Insert the correct path to the udacity data directory")
@@ -159,20 +175,24 @@ if __name__ == "__main__":
     df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list)
     table_mutants_for_no_crashes_obes = compute_and_merge_metric_mutant_tables(df_no_crashes_obes,
                                                                                org_model_data)
-    print(
-        'mutants killed by metrics from mutant list not having crashes or obes_________')
+    # print(
+    #    'mutants killed by metrics from mutant list not having crashes or obes_________')
 
     killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
-    print(killed_mutants_for_no_crashes_obes)
-    print(get_metrics_info(killed_mutants_for_no_crashes_obes))
+    # print(killed_mutants_for_no_crashes_obes)
+    # print(get_metrics_info(killed_mutants_for_no_crashes_obes))
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
                                                                 some_crashes_obes_list['mutation'].tolist())
     table_mutants_for_some_crashes_obes = compute_and_merge_metric_mutant_tables(df_some_crashes_obes,
                                                                                  org_model_data)
-    print(
-        '\n mutants killed by metrics from mutant list having some crashes or obes_________')
+    # print(
+    #    '\n mutants killed by metrics from mutant list having some crashes or obes_________')
     killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
-    print(killed_mutants_for_some_crashes_obes)
-    print(get_metrics_info(killed_mutants_for_some_crashes_obes))
+    # print(killed_mutants_for_some_crashes_obes)
+    # print(get_metrics_info(killed_mutants_for_some_crashes_obes))
+
+    df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
+    df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
+    print(df_a.append(df_b).reset_index(drop=True))

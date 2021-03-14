@@ -83,3 +83,4 @@ if __name__ == "__main__":
 
     mutant_lst_with_crashes_or_obes_on_some_and_all_model = build_mutant_list_having_crashes_obes_on_some_models(df)
     filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model, mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv('mutant_list_having_crashes_or_obes_on_some_models.csv')
+
