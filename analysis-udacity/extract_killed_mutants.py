@@ -1,12 +1,14 @@
 import os
 import sys
 from functools import reduce
+from pprint import pprint
 
 import numpy as np
 import pandas as pd
 
 from analyse_crashes_obes import extract_crashes_obes_data, build_mutant_list_not_having_crashes_obes, \
     build_mutant_list_having_crashes_obes_on_some_models
+from extract_model_level_data import extract_data_from_csv
 from stats import is_diff_sts
 
 pd.set_option('display.expand_frame_repr', False)
@@ -38,10 +40,14 @@ Std_TPP = 'Std(TPP)'
 # Count_Braking = 'Count(Braking)'
 
 # metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
-#          STD_LP, Max_Speed,
-#         Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+#         STD_LP, Max_Speed,
+#       Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
 
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP]
+cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
+      (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
+      (STD_LP, -0.60), (Max_Speed, 0.23), (Mean_Acc, 0.64), (Min_Acc, 0.53), (Std_Acc, -0.22), (Mean_TPP, 0.43),
+      (Std_TPP, -0.04)]
 
 
 # given list of mutants with no crashes or obes ,
@@ -109,11 +115,10 @@ def compute_table_for_metric(org, x, metric):
     if len(x[metric]) == 20:
         mutant_list = x[metric].tolist()
         org_list = org[metric].tolist()
+        effect_size=([item for item in cc if item[0] == metric][0][1])
         for i in range(0, 27):
             if remove_this_func_later(mutant_list, i):
-
-                data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list])
-
+                data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list],effect_size)
                 if data[0]:
                     killed = 'killed: ' + str(data[0]) + ',' + 'Sector number: ' + str(i)
                     break
@@ -168,7 +173,7 @@ def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
                          })
 
 
-def make_table_of_mutants_and_metrics_killed_them(lst, df):
+def make_table_of_mutants_and_metrics_killed_them(lst, df, model_level_data):
     main_df = []
     for i in lst:
         data = {}
@@ -177,10 +182,19 @@ def make_table_of_mutants_and_metrics_killed_them(lst, df):
             data['Mutant'] = i
             data['killed atleast by one metric'] = 'Yes'
             data['Metrics killed it'] = tmp_df.iloc[0]['Metrics killed']
+            if i[8:] in [j[0] for j in model_level_data]:
+                data['Killed by Model-level data'] = [item for item in model_level_data if item[0] == i[8:]][0][1]
+            else:
+                data['Killed by Model-level data'] = 'Not exist'
+
         else:
             data['Mutant'] = i
             data['killed atleast by one metric'] = 'No'
             data['Metrics killed it'] = []
+            if i[8:] in [j[0] for j in model_level_data]:
+                data['Killed by Model-level data'] = [item for item in model_level_data if item[0] == i[8:]][0][1]
+            else:
+                data['Killed by Model-level data'] = 'Not exist'
 
         main_df.append(data)
 
@@ -198,25 +212,28 @@ if __name__ == "__main__":
     df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list)
     table_mutants_for_no_crashes_obes = compute_and_merge_metric_mutant_tables(df_no_crashes_obes,
                                                                                org_model_data)
-    # print(
-    #    'mutants killed by metrics from mutant list not having crashes or obes_________')
+    print(
+        'mutants killed by metrics from mutant list not having crashes or obes_________')
 
     killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
-    # print(killed_mutants_for_no_crashes_obes)
-    print(get_metrics_info(killed_mutants_for_no_crashes_obes))
+    killed_mutants_for_no_crashes_obes.to_csv('killed_info_of_mutants_for_no_crashes_obes.csv')
+    get_metrics_info(killed_mutants_for_no_crashes_obes).to_csv('metrics_info_mutants_for_no_crashes_obes.csv')
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
                                                                 some_crashes_obes_list['mutation'].tolist())
     table_mutants_for_some_crashes_obes = compute_and_merge_metric_mutant_tables(df_some_crashes_obes,
                                                                                  org_model_data)
-    # print(
-    #    '\n mutants killed by metrics from mutant list having some crashes or obes_________')
+    print(
+        '\n mutants killed by metrics from mutant list having some crashes or obes_________')
     killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
-    # print(killed_mutants_for_some_crashes_obes)
-    print(get_metrics_info(killed_mutants_for_some_crashes_obes))
+    killed_mutants_for_some_crashes_obes.to_csv('killed_info_of_mutants_for_some_crashes_obes.csv')
+    get_metrics_info(killed_mutants_for_some_crashes_obes).to_csv('metrics_info_mutants_for_some_crashes_obes.csv')
 
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
-    print(make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a))
-    print(make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b))
+    model_level_data = extract_data_from_csv(sys.argv[2])
+    pprint(model_level_data)
+    print(make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data))
+    print(make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b,
+                                                        model_level_data))
