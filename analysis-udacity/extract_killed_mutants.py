@@ -101,6 +101,7 @@ def extract_original_model_data(path):
     return main_df.reset_index(drop=True)
 
 
+# this function is to filter out mutants not having 28 sectors
 def remove_this_func_later(a, i):
     try:
         [item[i] for item in a]

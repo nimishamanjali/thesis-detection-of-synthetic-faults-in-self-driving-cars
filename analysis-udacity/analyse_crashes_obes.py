@@ -70,6 +70,7 @@ def extract_crashes_obes_data(path):
          })
 
 
+# filter out mutants that have crashes or obes on some model from mutants that have crashes or obes on all models
 def filter_some_from_all(df1, df2):
     return df2[~df2['mutation'].isin(df1['mutation'].tolist())].reset_index(drop=True)
 
