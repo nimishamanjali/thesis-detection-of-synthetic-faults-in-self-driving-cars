@@ -22,10 +22,10 @@ def cohen_d(orig_accuracy_list, accuracy_list):
 def is_diff_sts(orig_value_list, mutant_value_list, cc, threshold=0.05):
     p_value = p_value_glm(orig_value_list, mutant_value_list)
     effect_size = cohen_d(orig_value_list, mutant_value_list)
-    #if cc < 0:
-    is_sts = ((p_value < threshold) and effect_size <= -0.5)
-    #elif cc > 0:
-     #   is_sts = ((p_value < threshold) and effect_size >= 0.5)
+    if cc < 0:
+        is_sts = ((p_value < threshold) and effect_size <= -0.5)
+    elif cc > 0:
+        is_sts = ((p_value < threshold) and effect_size >= 0.5)
     return is_sts, p_value, effect_size
 
 

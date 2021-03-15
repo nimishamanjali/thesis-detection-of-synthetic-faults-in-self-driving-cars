@@ -10,6 +10,7 @@ pd.set_option('display.max_colwidth', None)
 
 CRASHES_COUNT = '#crashes'
 OBEs_COUNT = '#OBEs'
+lst_of_mutants_lacking_all_28_sectors = []
 
 
 # Provide a list of mutants which do not have any crashes or OBEs
@@ -54,10 +55,13 @@ def extract_crashes_obes_data(path):
     obes = []
     for i in filenames:
         filtered_csv = pd.read_csv(i, usecols=['Crashes', 'OBEs'])
+
         filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
         crashes.append((filtered_csv.sum(axis=0)['Crashes']))
         obes.append((filtered_csv.sum(axis=0)['OBEs']))
         # print(os.path.splitext(i.split('/')[-2])[0])
+        extract_mutants_without_28_sectors('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]),
+                                           filtered_csv)
 
     return pd.DataFrame(
         {'mutation': filename,
@@ -70,11 +74,29 @@ def filter_some_from_all(df1, df2):
     return df2[~df2['mutation'].isin(df1['mutation'].tolist())].reset_index(drop=True)
 
 
+def extract_mutants_without_20_instances(df):
+    df_instance_count = df.value_counts(subset=['mutation']).reset_index(name='counts')
+    # print(df_instance_count)
+    return df_instance_count[df_instance_count.counts < 20]['mutation'].tolist()
+
+
+def extract_mutants_without_28_sectors(filename, df):
+    if len(df.index) < 28:
+        lst_of_mutants_lacking_all_28_sectors.append(filename)
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 1:
-        raise FileNotFoundError("Insert the correct path to the udacity data directory")
+
+    if len(sys.argv) < 2:
+        raise FileNotFoundError(
+            "Insert the correct path to the udacity data directory")
 
     df = extract_crashes_obes_data(sys.argv[1])
+    lst_of_mutants_lacking_20_runs = extract_mutants_without_20_instances(df)
+    pd.DataFrame(lst_of_mutants_lacking_20_runs, columns=['mutants']).to_csv(
+        'mutants_lacking_20_models.csv')
+    pd.DataFrame(list(set(lst_of_mutants_lacking_all_28_sectors)), columns=['mutants']).to_csv(
+        'mutants_lacking_28_sectors.csv')
     build_mutant_list_not_having_crashes_obes(df).to_csv('mutant_list_not_having_crashes_obes.csv')
 
     mutant_lst_with_crashes_or_obes_on_all_model = build_mutant_list_having_crashes_obes_on_all_models(
@@ -82,5 +104,6 @@ if __name__ == "__main__":
     mutant_lst_with_crashes_or_obes_on_all_model.to_csv('mutant_list_having_crashes_or_obes_on_all_models.csv')
 
     mutant_lst_with_crashes_or_obes_on_some_and_all_model = build_mutant_list_having_crashes_obes_on_some_models(df)
-    filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model, mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv('mutant_list_having_crashes_or_obes_on_some_models.csv')
-
+    filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model,
+                         mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv(
+        'mutant_list_having_crashes_or_obes_on_some_models.csv')

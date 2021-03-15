@@ -17,7 +17,6 @@ def remove_if_nan(lst):
     return [i for i in lst if 'nan' not in i]
 
 
-# 7.96
 def extract_data_from_csv(path):
     binary_search_files = []
     exs_search_files = []
@@ -66,7 +65,7 @@ def extract_data_from_csv(path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 1:
-        raise FileNotFoundError("Insert the correct path to the udacity data directory")
+    if len(sys.argv) < 2:
+        raise FileNotFoundError("Insert the correct path to the model-level data directory")
 
     pprint((extract_data_from_csv(sys.argv[1])))

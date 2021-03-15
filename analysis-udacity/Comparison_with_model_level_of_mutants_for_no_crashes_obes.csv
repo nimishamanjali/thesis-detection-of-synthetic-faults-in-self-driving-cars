@@ -1,0 +1,12 @@
+,Mutant,killed atleast by one metric,Metrics killed it,Killed by model-level data
+0,udacity_add_weights_regularisation_mutated0_MP_l1_l2_3,Yes,"['Mean(LP)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Std(TPP)']",False
+1,udacity_add_weights_regularisation_mutated0_MP_l2_3,Yes,"['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']",False
+2,udacity_change_activation_function_mutated0_MP_selu_4,Yes,"['Std(Speed)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Min(Acc)', 'Std(TPP)']",False
+3,udacity_change_dropout_rate_mutated0_MP_0.125_0.125_6,Yes,"['Std(Speed)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False
+4,udacity_change_epochs_mutated0_MP_50_47,Yes,"['Mean(LP)', 'Std(Speed)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
+5,udacity_change_loss_function_mutated0_MP_huber_loss,No,[],False
+6,udacity_change_weights_initialisation_mutated0_MP_he_uniform_3,Yes,"['Std(SA)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False
+7,udacity_change_weights_initialisation_mutated0_MP_lecun_normal_3,Yes,"['Mean(LP)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Std(Acc)', 'Std(TPP)']",False
+8,udacity_change_weights_initialisation_mutated0_MP_ones_4,Yes,"['Mean(LP)', 'Std(Speed)', 'Std(SA)', 'Max(LP)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False
+9,udacity_make_output_classes_overlap_mutated0_MP_3.12,Yes,"['Std(SA)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Std(LP)', 'Mean(Acc)', 'Std(Acc)']",True
+10,udacity_remove_activation_function_mutated0_MP_4,Yes,"['Mean(LP)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False

@@ -1,0 +1,20 @@
+,Metric,#mutants killed
+0,Std(LP),85
+3,Max(Acc),84
+1,Std(LS),84
+2,Max(LP),83
+7,Std(Acc),81
+8,Mean(Acc),78
+4,Mean(SAS),77
+10,Max(Speed),75
+9,Std(TPP),73
+5,Std(SA),73
+12,Min(LP),68
+16,Mean(LP),67
+6,Max(SA),65
+14,Mean(SA),64
+13,Min(Acc),63
+15,Mean(TPP),63
+11,Mean(LS),58
+17,Std(Speed),45
+18,Std(SAS),37
