@@ -253,7 +253,7 @@ if __name__ == "__main__":
         'computed mutants killed by metrics from mutant list not having crashes or obes_________')
 
     killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
-    killed_mutants_for_no_crashes_obes.to_csv('killed_info_of_mutants_for_no_crashes_obes.csv')
+    killed_mutants_for_no_crashes_obes.to_csv('results(csv)/killed_info_of_mutants_for_no_crashes_obes.csv')
     metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
@@ -264,19 +264,19 @@ if __name__ == "__main__":
     print(
         '\ncomputed mutants killed by metrics from mutant list having some crashes or obes_________')
     killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
-    killed_mutants_for_some_crashes_obes.to_csv('killed_info_of_mutants_for_some_crashes_obes.csv')
+    killed_mutants_for_some_crashes_obes.to_csv('results(csv)/killed_info_of_mutants_for_some_crashes_obes.csv')
     metrics_info_for_some_crashes_obes = get_metrics_info(killed_mutants_for_some_crashes_obes)
     merged_metrics_info_of_some_and_no = (
         pd.merge(metrics_info_for_no_crashes_obes, metrics_info_for_some_crashes_obes, on=['Metric']).set_index(
             ['Metric']).sum(axis=1).reset_index(name='#mutants killed').sort_values(by='#mutants killed',
                                                                                     ascending=False))
-    merged_metrics_info_of_some_and_no.to_csv('metrics_info_on_how_many_mutants_they_kill.csv')
+    merged_metrics_info_of_some_and_no.to_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
     model_level_data = extract_data_from_csv(sys.argv[2])
 
     make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data).to_csv(
-        'Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv')
+        'results(csv)/Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv')
     make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b,
                                                   model_level_data).to_csv(
-        'Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')
+        'results(csv)/Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')

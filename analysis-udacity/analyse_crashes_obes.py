@@ -95,16 +95,16 @@ if __name__ == "__main__":
     df = extract_crashes_obes_data(sys.argv[1])
     lst_of_mutants_lacking_20_runs = extract_mutants_without_20_instances(df)
     pd.DataFrame(lst_of_mutants_lacking_20_runs, columns=['mutants']).to_csv(
-        'mutants_lacking_20_models.csv')
+        'results(csv)/mutants_lacking_20_models.csv')
     pd.DataFrame(list(set(lst_of_mutants_lacking_all_28_sectors)), columns=['mutants']).to_csv(
-        'mutants_lacking_28_sectors.csv')
-    build_mutant_list_not_having_crashes_obes(df).to_csv('mutant_list_not_having_crashes_obes.csv')
+        'results(csv)/mutants_lacking_28_sectors.csv')
+    build_mutant_list_not_having_crashes_obes(df).to_csv('results(csv)/mutant_list_not_having_crashes_obes.csv')
 
     mutant_lst_with_crashes_or_obes_on_all_model = build_mutant_list_having_crashes_obes_on_all_models(
         df)  # mutants killed
-    mutant_lst_with_crashes_or_obes_on_all_model.to_csv('mutant_list_having_crashes_or_obes_on_all_models.csv')
+    mutant_lst_with_crashes_or_obes_on_all_model.to_csv('results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')
 
     mutant_lst_with_crashes_or_obes_on_some_and_all_model = build_mutant_list_having_crashes_obes_on_some_models(df)
     filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model,
                          mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv(
-        'mutant_list_having_crashes_or_obes_on_some_models.csv')
+        'results(csv)/mutant_list_having_crashes_or_obes_on_some_models.csv')
