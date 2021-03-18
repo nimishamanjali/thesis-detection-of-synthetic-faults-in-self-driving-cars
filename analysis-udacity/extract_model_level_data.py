@@ -49,6 +49,7 @@ def extract_data_from_csv(path):
                         binary_search_files.append(model_name + str(
                             '%g' % (row[2])) + ' ' + str(row[5]))
 
+
         if i.endswith('_exssearch.csv'):
             tmp = pd.read_csv(i, header=None)
             if not tmp.empty:
@@ -58,7 +59,6 @@ def extract_data_from_csv(path):
         if i.endswith('_nosearch.csv'):
             tmp = pd.read_csv(i, header=None)
             no_search_files.append(model_name[:-1] + ' ' + str(tmp.iloc[0, -1]))
-
     final_list = binary_search_files + exs_search_files + no_search_files
     tuple_list = [make_tuple_from_string(element) for element in final_list]
     return remove_if_nan(tuple_list)

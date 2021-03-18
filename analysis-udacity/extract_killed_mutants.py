@@ -41,9 +41,9 @@ STD_BRAKE = 'Std(Brake)'
 Min_Speed = 'Min(Speed)'
 
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
-           STD_LP, Max_Speed,
-           Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
-# metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP,MAX_ACC,Std_LS]
+          STD_LP, Max_Speed,
+         Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+#metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
 
 cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
       (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
@@ -270,6 +270,28 @@ def make_table_of_mutants_and_metrics_killed_them(lst_of_mutant_names_to_modify,
     return pd.DataFrame.from_dict(main_df)
 
 
+def build_range_binary_search(lst):
+    res = [(lst[i], lst[i + 1])
+           for i in range(len(lst) - 1)]
+    return res
+
+
+def construct_range_table_for_binary_search(model_level_data, bs):
+    main_df = []
+    for i in bs:
+        data = []
+        for j in [x for x in model_level_data]:
+            if i in j[0]:
+                data.append(j)
+        sorted_data = sorted(data, key=lambda x: float(x[0].split('_')[-1]))
+
+        for j in build_range_binary_search(sorted_data):
+            if j[0][1] == j[1][1]:
+                main_df.append({'range': (j[0][0], j[1][0]), 'killed': j[0][1]})
+
+    return pd.DataFrame.from_dict(main_df)
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         raise FileNotFoundError(
@@ -277,6 +299,10 @@ if __name__ == "__main__":
 
     df_crashes_obes = extract_crashes_obes_data(sys.argv[1])
     org_model_data = extract_original_model_data(sys.argv[1])
+    model_level_data = extract_data_from_csv(sys.argv[2])
+    bs = ['delete_td', 'output_classes', 'change_label', 'change_epochs', 'change_learning_rate']
+
+    print(construct_range_table_for_binary_search(model_level_data, bs))
 
     no_crashes_obes_list = build_mutant_list_not_having_crashes_obes(df_crashes_obes)
     df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list)
@@ -310,7 +336,6 @@ if __name__ == "__main__":
     merged_metrics_info_of_some_and_no.to_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
-    model_level_data = extract_data_from_csv(sys.argv[2])
 
     make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data).to_csv(
         'results(csv)/Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv')
