@@ -43,6 +43,7 @@ Min_Speed = 'Min(Speed)'
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
            STD_LP, Max_Speed,
            Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+# metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP,MAX_ACC,Std_LS]
 
 cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
       (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
@@ -161,6 +162,38 @@ def get_metrics_info(table_mutants_for_no_crashes_obes):
     return pd.DataFrame.from_dict(main_df).sort_values(by='#mutants killed', ascending=False).reset_index(drop=True)
 
 
+def extract_minimal_metrics_that_kills_all_mutants(table_mutants_for_no_crashes_obes,
+                                                   killed_mutants_for_some_crashes_obes):
+    whole_df = pd.concat([table_mutants_for_no_crashes_obes, killed_mutants_for_some_crashes_obes]).reset_index(
+        drop=True)
+    lst = []
+    main_df = []
+    killed_metrics = []
+    for i in metrics:
+        lst.append((i, len(
+            whole_df[(whole_df[i] != 'Not killed by this metric')]),
+                    whole_df[
+                        (whole_df[i] != 'Not killed by this metric')]['mutation'].tolist()))
+    for i in lst:
+        main_df.append({'Metric': i[0], '#mutants killed': i[1], 'killed mutants': i[2]})
+        killed_metrics.append(i[2])
+    df_info = pd.DataFrame.from_dict(main_df).sort_values(by='#mutants killed', ascending=False).reset_index(drop=True)
+
+    flat_list = set([item for sublist in killed_metrics for item in sublist])
+    minimal = []
+    for index, row in df_info.iterrows():
+        flat_list = [x for x in flat_list if x not in row[2]]
+        minimal.append((row[0], row[1]))
+        if not flat_list:
+            break
+
+    df_samples = df_info.loc[df_info['#mutants killed'].isin([x[1] for x in minimal])]
+    for index, row in df_samples.iterrows():
+        minimal.append((row[0], row[1]))
+
+    return pd.DataFrame([x[0] for x in list(set(minimal))], columns=['metrics'])
+
+
 def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
     metrics_killed = ((killed_mutants_for_no_crashes_obes.apply(
         lambda row: (row[row != 'Not killed by this metric'].index, row[0]), axis=1)).to_frame(name='metrics_killed'))
@@ -254,6 +287,7 @@ if __name__ == "__main__":
 
     killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
     killed_mutants_for_no_crashes_obes.to_csv('results(csv)/killed_info_of_mutants_for_no_crashes_obes.csv')
+
     metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
@@ -270,6 +304,9 @@ if __name__ == "__main__":
         pd.merge(metrics_info_for_no_crashes_obes, metrics_info_for_some_crashes_obes, on=['Metric']).set_index(
             ['Metric']).sum(axis=1).reset_index(name='#mutants killed').sort_values(by='#mutants killed',
                                                                                     ascending=False))
+    extract_minimal_metrics_that_kills_all_mutants(killed_mutants_for_no_crashes_obes,
+                                                   killed_mutants_for_some_crashes_obes).to_csv(
+        'results(csv)/minimal_set_of_metrics_that_kills_all_mutants')
     merged_metrics_info_of_some_and_no.to_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
