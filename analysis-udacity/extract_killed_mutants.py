@@ -1,4 +1,5 @@
 import os
+import os
 import sys
 from decimal import Decimal
 from functools import reduce
@@ -41,9 +42,9 @@ STD_BRAKE = 'Std(Brake)'
 Min_Speed = 'Min(Speed)'
 
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
-          STD_LP, Max_Speed,
-         Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
-#metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
+           STD_LP, Max_Speed,
+           Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+# metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
 
 cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
       (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
@@ -162,6 +163,54 @@ def get_metrics_info(table_mutants_for_no_crashes_obes):
     return pd.DataFrame.from_dict(main_df).sort_values(by='#mutants killed', ascending=False).reset_index(drop=True)
 
 
+def extract_metric_based_on_level_of_killing(row, i):
+    if any(e in row['killed'] for e in i):
+        return row['Metric']
+
+
+def extract_metrics_based_on_killing_level_of_mutants(x, df_info):
+    val = (df_info.apply(
+        lambda row: extract_metric_based_on_level_of_killing(row, x['Metric'].tolist()), axis=1).tolist())
+    return [x for x in val if x is not None]
+
+
+def rank_metrics_in_terms_of_uniquity_of_killing(killed_mutants_for_no_crashes_obes,
+                                                 killed_mutants_for_some_crashes_obes):
+    whole_df = pd.concat([killed_mutants_for_no_crashes_obes, killed_mutants_for_some_crashes_obes]).reset_index(
+        drop=True)
+
+    lst = []
+    main_df = []
+    for i in metrics:
+        lst.append((i,
+                    whole_df[
+                        (whole_df[i] != 'Not killed by this metric')]['mutation'].tolist()))
+    for i in lst:
+        main_df.append({'Metric': i[0], 'killed': i[1]})
+    df_info = pd.DataFrame.from_dict(main_df).reset_index(drop=True)
+    flat_list = [item for sublist in df_info['killed'].tolist() for item in sublist]
+    counts = []
+    for i in set(flat_list):
+        i_count = 0
+        for index, row in df_info.iterrows():
+            i_count += (row['killed'].count(i))
+        counts.append({'Metric': i, '#metrics killed': i_count})
+    df = pd.DataFrame.from_dict(counts).sort_values('#metrics killed')
+    all_metrics = df_info['Metric'].tolist()
+    tmp_df = df.groupby(by=['#metrics killed']).apply(
+        lambda x: extract_metrics_based_on_killing_level_of_mutants(x, df_info)).reset_index(name='metrics at level')
+    ranks = []
+    count = 0
+    for index, row in tmp_df.iterrows():
+        metric_lst = [x for x in all_metrics if x in (row['metrics at level'])]
+        if metric_lst:
+            ranks.append({'ranking': count, 'metrics ': metric_lst})
+            all_metrics = [x for x in all_metrics if x not in row['metrics at level']]
+            count += 1
+
+    return pd.DataFrame.from_dict(ranks).reset_index(drop=True)
+
+
 def extract_minimal_metrics_that_kills_all_mutants(table_mutants_for_no_crashes_obes,
                                                    killed_mutants_for_some_crashes_obes):
     whole_df = pd.concat([table_mutants_for_no_crashes_obes, killed_mutants_for_some_crashes_obes]).reset_index(
@@ -178,7 +227,6 @@ def extract_minimal_metrics_that_kills_all_mutants(table_mutants_for_no_crashes_
         main_df.append({'Metric': i[0], '#mutants killed': i[1], 'killed mutants': i[2]})
         killed_metrics.append(i[2])
     df_info = pd.DataFrame.from_dict(main_df).sort_values(by='#mutants killed', ascending=False).reset_index(drop=True)
-
     flat_list = set([item for sublist in killed_metrics for item in sublist])
     minimal = []
     for index, row in df_info.iterrows():
@@ -390,6 +438,9 @@ if __name__ == "__main__":
     extract_minimal_metrics_that_kills_all_mutants(killed_mutants_for_no_crashes_obes,
                                                    killed_mutants_for_some_crashes_obes).to_csv(
         'results(csv)/minimal_set_of_metrics_that_kills_all_mutants')
+    rank_metrics_in_terms_of_uniquity_of_killing(killed_mutants_for_no_crashes_obes,
+                                                 killed_mutants_for_some_crashes_obes).to_csv(
+        'results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')
     merged_metrics_info_of_some_and_no.to_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
