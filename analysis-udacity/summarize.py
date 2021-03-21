@@ -103,7 +103,7 @@ if __name__ == "__main__":
         metrics_data = pd.read_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
         highest_kill = metrics_data['Metric'].iloc[0]
         metrics_rank_data = \
-        pd.read_csv('results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')['Metrics'].iloc[0]
+            pd.read_csv('results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')['Metrics'].iloc[0]
 
         out.write('\n')
         out.write('\n')
@@ -115,3 +115,23 @@ if __name__ == "__main__":
         out.write('The rank 1 metrics which kills mutations when all the other metrics can not kill it: ' + str(
             metrics_rank_data))
         out.write('\n')
+        out.write('\n')
+
+        #Run analyze method in extract_killed_mutants.py with parameter False to get correct following data
+        model_level_data_killing_percent = len(
+            df_comparison_model_system[df_comparison_model_system['Killed by model-level data'] == True]) / len(
+            mutants_analysed)
+        crash_obes_killing = len(mutants_having_crashes_obes_on_all_model) / len(mutants_analysed)
+        stat_killing = len(mutants_killed_by_stat_killing) / len(mutants_analysed)
+
+        out.write('killing ability percentages: ')
+        out.write('\n')
+        out.write('Model level killing: '+"{:.2f}".format(model_level_data_killing_percent))
+        out.write('\n')
+        out.write('Killed if crashes/OBEs on all model: '+"{:.2f}".format(crash_obes_killing))
+        out.write('\n')
+        out.write('Killed by statistical killing definition: '+"{:.2f}".format(stat_killing))
+
+
+
+

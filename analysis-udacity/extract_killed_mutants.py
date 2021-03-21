@@ -41,13 +41,15 @@ Count_Braking = 'Count(Braking)'
 STD_BRAKE = 'Std(Brake)'
 Min_Speed = 'Min(Speed)'
 
-
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
            STD_LP, Max_Speed,
            Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
+
+
 # metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
 def get_all_metrics():
     return metrics
+
 
 cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
       (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
@@ -389,14 +391,9 @@ def construct_range_table_for_binary_search(model_level_data, bs):
     return pd.DataFrame.from_dict(main_df)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        raise FileNotFoundError(
-            "Insert the correct path to the (1) udacity data directory and (2) model-level data directory")
-
+def analyze(exclude=True):
     mutants_to_exclude = pd.read_csv('results(csv)/mutants_lacking_28_sectors.csv')['mutants'].tolist() + \
                          pd.read_csv('results(csv)/mutants_lacking_20_models.csv')['mutants'].tolist()
-
     df_crashes_obes = extract_crashes_obes_data(sys.argv[1])
     org_model_data = extract_original_model_data(sys.argv[1])
     model_level_data = extract_data_from_csv(sys.argv[2])
@@ -419,8 +416,13 @@ if __name__ == "__main__":
     metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     all_crashes_obes_list = pd.read_csv('results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')
-    some_crashes_obes_list = filter_some_from_all(all_crashes_obes_list,
-                                                  build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes))
+    some_crashes_obes_list = []
+    if exclude:
+        some_crashes_obes_list = filter_some_from_all(all_crashes_obes_list,
+                                                      build_mutant_list_having_crashes_obes_on_some_models(
+                                                          df_crashes_obes))
+    else:
+        some_crashes_obes_list = build_mutant_list_having_crashes_obes_on_some_models(df_crashes_obes)
 
     some_crashes_obes_list = (
         some_crashes_obes_list[~some_crashes_obes_list['mutation'].isin(mutants_to_exclude)]).reset_index(drop=True)
@@ -452,3 +454,11 @@ if __name__ == "__main__":
     make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b,
                                                   model_level_data, range_data).to_csv(
         'results(csv)/Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        raise FileNotFoundError(
+            "Insert the correct path to the (1) udacity data directory and (2) model-level data directory")
+
+    analyze()
