@@ -96,12 +96,11 @@ Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs 
  'udacity_unbalance_train_data_mutated0_MP_100']
 
 analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 81
-mutants killed on statistical killing approach: 86
-mutants not killed on statistical killing approach: -5[]
-
+mutants killed on statistical killing approach: 81
+mutants not killed on statistical killing approach: 0
 
 Information on Comparison between model-level and system-level killing
-% : mutant is killed on both model level and system level killing: 43.02325581395349
+% : mutant is killed on both model level and system level killing: 40.74
 % : mutant is not killed on both model level and system level killing: 0.0
 
 Information on metrics
@@ -109,6 +108,6 @@ Metrics which kills high number of mutants: ['Max(Acc)']
 The rank 1 metrics which kills mutations when all the other metrics can not kill it: ['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']
 
 killing ability percentages: 
-Model level killing: 0.43
+Model level killing(on remaining not killed mutants from Crashes/OBEs): 0.38
 Killed if crashes/OBEs on all model: 0.06
-Killed by statistical killing definition: 1.00
+Killed by statistical killing definition(on remaining not killed mutants from Crashes/OBEs): 0.94

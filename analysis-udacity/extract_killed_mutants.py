@@ -416,7 +416,7 @@ def analyze(exclude=True):
     metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     all_crashes_obes_list = pd.read_csv('results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')
-    some_crashes_obes_list = []
+
     if exclude:
         some_crashes_obes_list = filter_some_from_all(all_crashes_obes_list,
                                                       build_mutant_list_having_crashes_obes_on_some_models(
@@ -461,4 +461,5 @@ if __name__ == "__main__":
         raise FileNotFoundError(
             "Insert the correct path to the (1) udacity data directory and (2) model-level data directory")
 
+    # provide parameter False if you want to do analysis on all models without excluding the ones with crashes/OBEs on all models
     analyze()

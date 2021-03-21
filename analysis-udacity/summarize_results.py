@@ -34,7 +34,7 @@ def get_all_mutants(path):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise FileNotFoundError("Insert the correct path to the model-level data directory")
-    with open('results(csv)/summarized_results.txt', 'wt') as out:
+    with open('summary.txt', 'wt') as out:
         all_mutants = get_all_mutants(sys.argv[1])
         out.write("Total mutants: " + str(len(all_mutants)) + '\n\n')
         mutants_without_20_runs = pd.read_csv('results(csv)/mutants_lacking_20_models.csv')['mutants'].tolist()
@@ -73,8 +73,13 @@ if __name__ == "__main__":
         out.write('\n')
         out.write('mutants killed on statistical killing approach: ' + str(len(mutants_killed_by_stat_killing)))
         out.write('\n')
-        out.write('mutants not killed on statistical killing approach: ' + str(
-            len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)))
+
+        mutants_not_killed_by_stat = len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)
+
+        if mutants_not_killed_by_stat >= 0:
+            out.write('mutants not killed on statistical killing approach: ' + str(mutants_not_killed_by_stat
+                                                                                   ))
+
         if (len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)) != 0:
             pprint([x for x in mutants_for_stat_killing if x not in mutants_killed_by_stat_killing], stream=out)
 
@@ -95,7 +100,7 @@ if __name__ == "__main__":
         out.write('Information on Comparison between model-level and system-level killing')
         out.write('\n')
         out.write('% : mutant is killed on both model level and system level killing: ' +
-                  (str(killed_on_both_model / len(df_comparison_model_system) * 100)))
+                  ("{:.2f}".format(killed_on_both_model / len(df_comparison_model_system) * 100)))
         out.write('\n')
         out.write('% : mutant is not killed on both model level and system level killing: ' +
                   (str(not_killed_on_both_model / len(df_comparison_model_system) * 100)))
@@ -117,21 +122,17 @@ if __name__ == "__main__":
         out.write('\n')
         out.write('\n')
 
-        #Run analyze method in extract_killed_mutants.py with parameter False to get correct following data
         model_level_data_killing_percent = len(
             df_comparison_model_system[df_comparison_model_system['Killed by model-level data'] == True]) / len(
             mutants_analysed)
         crash_obes_killing = len(mutants_having_crashes_obes_on_all_model) / len(mutants_analysed)
+
         stat_killing = len(mutants_killed_by_stat_killing) / len(mutants_analysed)
 
         out.write('killing ability percentages: ')
         out.write('\n')
-        out.write('Model level killing: '+"{:.2f}".format(model_level_data_killing_percent))
+        out.write('Model level killing(on remaining not killed mutants from Crashes/OBEs): ' + "{:.2f}".format(model_level_data_killing_percent))
         out.write('\n')
-        out.write('Killed if crashes/OBEs on all model: '+"{:.2f}".format(crash_obes_killing))
+        out.write('Killed if crashes/OBEs on all model: ' + "{:.2f}".format(crash_obes_killing))
         out.write('\n')
-        out.write('Killed by statistical killing definition: '+"{:.2f}".format(stat_killing))
-
-
-
-
+        out.write('Killed by statistical killing definition(on remaining not killed mutants from Crashes/OBEs): ' + "{:.2f}".format(stat_killing))

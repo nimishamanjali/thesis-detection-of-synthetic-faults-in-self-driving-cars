@@ -12,3 +12,5 @@ Master thesis
   * (2) path to model-level data directory
 * To run the program extract_model_level_data.py, provide following parameter
   * path to model-level data directory
+* To run the program summarize_results.py, provide following parameter
+  * path to model-level data directory
