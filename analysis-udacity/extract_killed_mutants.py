@@ -103,15 +103,6 @@ def extract_original_model_data(path):
     return main_df.reset_index(drop=True)
 
 
-# this function is to filter out mutants not having 28 sectors
-def remove_this_func_later(a, i):
-    try:
-        [item[i] for item in a]
-    except IndexError:
-        return False
-    return True
-
-
 # perform statistical def of killing comparing each 20 mutant version to each 20 original model
 def compute_table_for_metric(org, x, metric):
     killed = None
@@ -120,12 +111,11 @@ def compute_table_for_metric(org, x, metric):
         org_list = org[metric].tolist()
         effect_size = ([item for item in cc if item[0] == metric][0][1])
         for i in range(0, 27):
-            if remove_this_func_later(mutant_list, i):
-                data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list], effect_size)
-                if data[0]:
-                    killed = 'killed: ' + str(data[0]) + ',' + 'Sector number: ' + str(i) + ',' + ' p_value: ' + str(
-                        data[1]) + ',' + ' effect_size: ' + str(data[2])
-                    break
+            data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list], effect_size)
+            if data[0]:
+                killed = 'killed: ' + str(data[0]) + ',' + 'Sector number: ' + str(i) + ',' + ' p_value: ' + str(
+                    data[1]) + ',' + ' effect_size: ' + str(data[2])
+                break
 
     return tuple(killed.split(",")) if killed is not None else 'killed: false'
 
@@ -450,7 +440,8 @@ if __name__ == "__main__":
     rank_metrics_in_terms_of_uniquity_of_killing(killed_mutants_for_no_crashes_obes,
                                                  killed_mutants_for_some_crashes_obes).to_csv(
         'results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')
-    merged_metrics_info_of_some_and_no.reset_index(drop=True).to_csv('results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
+    merged_metrics_info_of_some_and_no.reset_index(drop=True).to_csv(
+        'results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
     make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data, range_data).to_csv(
