@@ -41,10 +41,13 @@ Count_Braking = 'Count(Braking)'
 STD_BRAKE = 'Std(Brake)'
 Min_Speed = 'Min(Speed)'
 
+
 metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SAS, Std_SAS, Mean_LS, Std_LS, Min_LP,
            STD_LP, Max_Speed,
            Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
 # metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
+def get_all_metrics():
+    return metrics
 
 cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MAX_ACC, 0.32), (MAX_SA, -0.55),
       (Mean_SA, -0.55), (Mean_SAS, 0.60), (Std_SAS, -0.32), (Mean_LS, -0.44), (Std_LS, -0.40), (Min_LP, -0.24),
@@ -194,7 +197,7 @@ def rank_metrics_in_terms_of_uniquity_of_killing(killed_mutants_for_no_crashes_o
     for index, row in tmp_df.iterrows():
         metric_lst = [x for x in all_metrics if x in (row['metrics at level'])]
         if metric_lst:
-            ranks.append({'ranking': count, 'metrics ': metric_lst})
+            ranks.append({'Ranking': count, 'Metrics': metric_lst})
             all_metrics = [x for x in all_metrics if x not in row['metrics at level']]
             count += 1
 

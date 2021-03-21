@@ -88,11 +88,21 @@ Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 86
  'udacity_unbalance_train_data_mutated0_MP_46.88',
  'udacity_unbalance_train_data_mutated0_MP_50.0']
 
-Mutants killed already at level 1 : i.e List of mutants that have crashes or OBEs on all 20 model thus definitely has introduced a faulty behaviour
+Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs on all 20 model thus definitely has introduced a faulty behaviour: 5 mutants
 ['udacity_change_epochs_mutated0_MP_50_1',
  'udacity_change_loss_function_mutated0_MP_mean_absolute_percentage_error',
  'udacity_change_optimisation_function_mutated0_MP_adadelta',
  'udacity_delete_training_data_mutated0_MP_99',
  'udacity_unbalance_train_data_mutated0_MP_100']
 
-analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crahes or OBEs mutants killed on statistical killing approach: 
+analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 81
+mutants killed on statistical killing approach: 81
+mutants not killed on statistical killing approach: 0
+
+Information on Comparison between model-level and system-level killing
+% : mutant is killed on both model level and system level killing: 40.74074074074074
+% : mutant is not killed on both model level and system level killing: 0.0
+
+Information on metrics
+Metrics which kills high number of mutants: ['Max(Acc)']
+The rank 1 metrics which kills mutations when all the other metrics can not kill it: ['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']

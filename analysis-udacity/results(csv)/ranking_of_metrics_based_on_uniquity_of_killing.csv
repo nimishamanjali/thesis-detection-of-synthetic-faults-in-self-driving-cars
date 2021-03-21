@@ -1,4 +1,4 @@
-,ranking,metrics 
+,Ranking,Metrics
 0,0,"['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']"
 1,1,"['Mean(LP)', 'Std(Speed)', 'Mean(Acc)', 'Std(Acc)']"
 2,2,"['Max(SA)', 'Mean(SAS)', 'Mean(LS)', 'Min(LP)']"
