@@ -1,4 +1,3 @@
 ,metrics
-0,Std(LS)
-1,Max(Acc)
-2,Std(LP)
+0,Max(Acc)
+1,Std(LP)
