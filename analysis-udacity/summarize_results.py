@@ -131,8 +131,11 @@ if __name__ == "__main__":
 
         out.write('killing ability percentages: ')
         out.write('\n')
-        out.write('Model level killing(on remaining not killed mutants from Crashes/OBEs): ' + "{:.2f}".format(model_level_data_killing_percent))
+        out.write('Model level killing(on remaining mutants not killed from Crashes/OBEs): ' + "{:.2f}".format(
+            model_level_data_killing_percent))
         out.write('\n')
         out.write('Killed if crashes/OBEs on all model: ' + "{:.2f}".format(crash_obes_killing))
         out.write('\n')
-        out.write('Killed by statistical killing definition(on remaining not killed mutants from Crashes/OBEs): ' + "{:.2f}".format(stat_killing))
+        out.write(
+            'Killed by statistical killing definition(on remaining mutants not killed from Crashes/OBEs): ' + "{:.2f}".format(
+                stat_killing))

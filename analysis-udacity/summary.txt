@@ -108,6 +108,6 @@ Metrics which kills high number of mutants: ['Max(Acc)']
 The rank 1 metrics which kills mutations when all the other metrics can not kill it: ['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']
 
 killing ability percentages: 
-Model level killing(on remaining not killed mutants from Crashes/OBEs): 0.38
+Model level killing(on remaining mutants not killed from Crashes/OBEs): 0.38
 Killed if crashes/OBEs on all model: 0.06
-Killed by statistical killing definition(on remaining not killed mutants from Crashes/OBEs): 0.94
+Killed by statistical killing definition(on remaining mutants not killed from Crashes/OBEs): 0.94

@@ -1,5 +1,4 @@
 import os
-import os
 import sys
 from decimal import Decimal
 from functools import reduce
@@ -136,7 +135,7 @@ def filter_killed_mutants(df):
                                                                                                    regex=True)
 
 
-def compute_and_merge_metric_mutant_tables(df, org_model_data):
+def compute_and_merge_killed_info_mutant_tables(df, org_model_data):
     dfs = []
     for i in metrics:
         dfs.append((df.groupby(by=['mutation'])).apply(
@@ -371,7 +370,7 @@ def build_range_binary_search(lst):
     return res
 
 
-def construct_range_table_for_binary_search(model_level_data, bs):
+def construct_range_table_for_mutants_with_binary_search(model_level_data, bs):
     main_df = []
     for i in bs:
 
@@ -391,33 +390,31 @@ def construct_range_table_for_binary_search(model_level_data, bs):
     return pd.DataFrame.from_dict(main_df)
 
 
-def analyze(exclude=True):
+def analyze(exclude_mutants_having_crashes_or_obes_on_all_from_some=True):
     mutants_to_exclude = pd.read_csv('results(csv)/mutants_lacking_28_sectors.csv')['mutants'].tolist() + \
                          pd.read_csv('results(csv)/mutants_lacking_20_models.csv')['mutants'].tolist()
+    mutants_with_range = ['delete_td', 'output_classes', 'change_label', 'change_epochs', 'change_learning_rate',
+                          'unbalance_td']
     df_crashes_obes = extract_crashes_obes_data(sys.argv[1])
     org_model_data = extract_original_model_data(sys.argv[1])
     model_level_data = extract_data_from_csv(sys.argv[2])
-    mutants_with_range = ['delete_td', 'output_classes', 'change_label', 'change_epochs', 'change_learning_rate',
-                          'unbalance_td']
-
-    range_data = construct_range_table_for_binary_search(model_level_data, mutants_with_range)
+    mutants_range_data = construct_range_table_for_mutants_with_binary_search(model_level_data, mutants_with_range)
 
     no_crashes_obes_list = [x for x in build_mutant_list_not_having_crashes_obes(df_crashes_obes) if
                             x not in mutants_to_exclude]
     df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list)
-    table_mutants_for_no_crashes_obes = compute_and_merge_metric_mutant_tables(df_no_crashes_obes,
-                                                                               org_model_data)
+    table_killed_info_of_mutants_for_no_crashes_obes = compute_and_merge_killed_info_mutant_tables(df_no_crashes_obes,
+                                                                                                   org_model_data)
     print(
         'computed mutants killed by metrics from mutant list not having crashes or obes_________')
 
-    killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_mutants_for_no_crashes_obes)
+    killed_mutants_for_no_crashes_obes = filter_killed_mutants(table_killed_info_of_mutants_for_no_crashes_obes)
     killed_mutants_for_no_crashes_obes.to_csv('results(csv)/killed_info_of_mutants_for_no_crashes_obes.csv')
 
     metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     all_crashes_obes_list = pd.read_csv('results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')
-
-    if exclude:
+    if exclude_mutants_having_crashes_or_obes_on_all_from_some:
         some_crashes_obes_list = filter_some_from_all(all_crashes_obes_list,
                                                       build_mutant_list_having_crashes_obes_on_some_models(
                                                           df_crashes_obes))
@@ -428,31 +425,37 @@ def analyze(exclude=True):
         some_crashes_obes_list[~some_crashes_obes_list['mutation'].isin(mutants_to_exclude)]).reset_index(drop=True)
     df_some_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1],
                                                                 some_crashes_obes_list['mutation'].tolist())
-    table_mutants_for_some_crashes_obes = compute_and_merge_metric_mutant_tables(df_some_crashes_obes,
-                                                                                 org_model_data)
+    table_killed_info_of_mutants_for_some_crashes_obes = compute_and_merge_killed_info_mutant_tables(
+        df_some_crashes_obes,
+        org_model_data)
     print(
         '\ncomputed mutants killed by metrics from mutant list having some crashes or obes_________')
-    killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_mutants_for_some_crashes_obes)
+
+    killed_mutants_for_some_crashes_obes = filter_killed_mutants(table_killed_info_of_mutants_for_some_crashes_obes)
     killed_mutants_for_some_crashes_obes.to_csv('results(csv)/killed_info_of_mutants_for_some_crashes_obes.csv')
     metrics_info_for_some_crashes_obes = get_metrics_info(killed_mutants_for_some_crashes_obes)
-    merged_metrics_info_of_some_and_no = (
+
+    merged_metrics_info_of_some_and_no_crashes_obes = (
         pd.merge(metrics_info_for_no_crashes_obes, metrics_info_for_some_crashes_obes, on=['Metric']).set_index(
             ['Metric']).sum(axis=1).reset_index(name='#mutants killed').sort_values(by='#mutants killed',
                                                                                     ascending=False))
     extract_minimal_metrics_that_kills_all_mutants(killed_mutants_for_no_crashes_obes,
                                                    killed_mutants_for_some_crashes_obes).to_csv(
         'results(csv)/minimal_set_of_metrics_that_kills_all_mutants')
+
     rank_metrics_in_terms_of_uniquity_of_killing(killed_mutants_for_no_crashes_obes,
                                                  killed_mutants_for_some_crashes_obes).to_csv(
         'results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')
-    merged_metrics_info_of_some_and_no.reset_index(drop=True).to_csv(
+    merged_metrics_info_of_some_and_no_crashes_obes.reset_index(drop=True).to_csv(
         'results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
+
     df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
     df_b = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_some_crashes_obes)
-    make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data, range_data).to_csv(
+    make_table_of_mutants_and_metrics_killed_them(no_crashes_obes_list, df_a, model_level_data,
+                                                  mutants_range_data).to_csv(
         'results(csv)/Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv')
     make_table_of_mutants_and_metrics_killed_them(some_crashes_obes_list['mutation'].tolist(), df_b,
-                                                  model_level_data, range_data).to_csv(
+                                                  model_level_data, mutants_range_data).to_csv(
         'results(csv)/Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')
 
 
