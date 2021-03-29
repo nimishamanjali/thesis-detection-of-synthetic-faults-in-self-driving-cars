@@ -1,0 +1,6 @@
+,Ranking,Metrics
+0,0,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']"
+1,1,"['Mean(LS)', 'Mean(Acc)']"
+2,2,"['Mean(LP)', 'Max(LP)', 'Max(SA)', 'Min(LP)', 'Std(LP)']"
+3,3,['Std(TPP)']
+4,4,['Std(SA)']

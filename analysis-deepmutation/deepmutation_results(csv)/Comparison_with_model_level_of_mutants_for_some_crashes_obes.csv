@@ -1,0 +1,11 @@
+,Mutant,killed atleast by one metric,Metrics killed it,Killed by model-level data
+0,GF_0.05,Yes,"['Mean(LP)', 'Std(Speed)', 'Max(LP)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Min(LP)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False
+1,LA_0.01,Yes,"['Mean(LP)', 'Max(LP)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",False
+2,LD_0.03,Yes,"['Std(Speed)', 'Max(Acc)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
+3,LR_0.03,Yes,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
+4,NAI_0.01,Yes,"['Mean(LP)', 'Std(Speed)', 'Max(LP)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)']",False
+5,NEB_0.03,Yes,"['Mean(LP)', 'Std(Speed)', 'Std(SA)', 'Max(LP)', 'Max(SA)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",True
+6,NS_0.03,Yes,"['Mean(LP)', 'Std(Speed)', 'Std(SA)', 'Max(LP)', 'Max(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)', 'Std(TPP)']",True
+7,LD_0.05,Yes,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
+8,LR_0.01,Yes,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
+9,LR_0.05,Yes,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Max(Speed)', 'Mean(Acc)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']",False
