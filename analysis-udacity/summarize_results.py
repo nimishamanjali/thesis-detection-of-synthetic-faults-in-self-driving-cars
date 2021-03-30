@@ -47,7 +47,7 @@ def summarize(mutation_tool):
             'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/mutants_lacking_28_sectors.csv')[
             'mutants'].tolist()
         mutants_analysed = [x for x in all_mutants if x not in (mutants_without_20_runs + mutants_without_28_sectors)]
-        out.write('Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): ' + str(
+        out.write('# Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): ' + str(
             len(mutants_analysed)) + '\n')
         pprint(mutants_analysed, stream=out)
         out.write('\n')
@@ -66,7 +66,7 @@ def summarize(mutation_tool):
                stream=out)
         out.write('\n')
         out.write(
-            'analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: ' + str(
+            'analysing further on remaining mutants i.e # mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: ' + str(
                 len(mutants_analysed) - len(mutants_having_crashes_obes_on_all_model)))
         mutants_for_stat_killing = [x for x in mutants_analysed if x not in mutants_having_crashes_obes_on_all_model]
         mutants_killed_by_stat_killing = []
@@ -90,13 +90,13 @@ def summarize(mutation_tool):
                     break;
 
         out.write('\n')
-        out.write('mutants killed on statistical killing approach: ' + str(len(mutants_killed_by_stat_killing)))
+        out.write('# mutants killed on statistical killing approach: ' + str(len(mutants_killed_by_stat_killing)))
         out.write('\n')
 
         mutants_not_killed_by_stat = len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)
 
         if mutants_not_killed_by_stat >= 0:
-            out.write('mutants not killed on statistical killing approach: ' + str(mutants_not_killed_by_stat
+            out.write('# mutants not killed on statistical killing approach: ' + str(mutants_not_killed_by_stat
                                                                                    ))
         out.write('\n')
         if (len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)) != 0:

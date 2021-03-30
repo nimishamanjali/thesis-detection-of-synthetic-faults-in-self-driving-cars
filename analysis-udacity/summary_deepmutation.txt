@@ -1,6 +1,6 @@
 Total mutants: 24
 
-Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 10
+# Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 10
 ['GF_0.05',
  'LA_0.01',
  'LD_0.03',
@@ -15,9 +15,9 @@ Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 10
 Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs on all 20 model thus definitely has introduced a faulty behaviour: 0 mutants
 []
 
-analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 10
-mutants killed on statistical killing approach: 10
-mutants not killed on statistical killing approach: 0
+analysing further on remaining mutants i.e # mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 10
+# mutants killed on statistical killing approach: 10
+# mutants not killed on statistical killing approach: 0
 
 
 Information on Comparison between model-level and system-level killing

@@ -1,5 +1,4 @@
 import os
-import sys
 from functools import reduce
 
 import numpy as np
@@ -41,7 +40,6 @@ metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, MAX_SA, Mean_SA, Mean_SA
            Mean_Acc, Min_Acc, Std_Acc, Mean_TPP, Std_TPP]
 
 
-# metrics = [MEAN_LP, STD_SPEED, STD_SA, MAX_LP, MAX_ACC, Std_LS]
 def get_all_metrics():
     return metrics
 
@@ -53,7 +51,7 @@ cc = [(STD_SPEED, 0.22), (MEAN_LP, -0.75), (STD_SA, -0.67), (MAX_LP, -0.70), (MA
 
 
 # given list of mutants with no crashes or obes ,
-#  it extracts the metrics mean_LP,std_sa,std_speed of those mutant models to a dataframe
+#  it extracts the metrics of those mutant models to a dataframe
 def extract_data_based_given_mutant_list(path, no_crashes_obes_list, mutation_tool):
     if mutation_tool == 'deepmutation':
         no_crashes_obes_list = [element + "_1.h5" for element in no_crashes_obes_list]
@@ -131,6 +129,7 @@ def compute_table_for_metric(org, x, metric):
     return tuple(killed.split(",")) if killed is not None else 'killed: false'
 
 
+# filter out killed mutants from table of information on mutants whether it is killed
 def filter_killed_mutants(df):
     merged = []
     for i in metrics:
@@ -152,6 +151,7 @@ def compute_and_merge_killed_info_mutant_tables(df, org_model_data):
                   dfs)
 
 
+# get information of metrics about how many mutants it kill
 def get_metrics_info(table_mutants_for_no_crashes_obes):
     lst = []
     for i in metrics:
@@ -248,5 +248,3 @@ def extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes):
     return pd.DataFrame({'Mutant': mutant_lst,
                          'Metrics killed': metric_lst
                          })
-
-

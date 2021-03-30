@@ -1,6 +1,6 @@
 Total mutants: 98
 
-Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 86
+# Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 86
 ['udacity_add_weights_regularisation_mutated0_MP_l1_3',
  'udacity_add_weights_regularisation_mutated0_MP_l1_l2_3',
  'udacity_add_weights_regularisation_mutated0_MP_l2_3',
@@ -95,9 +95,9 @@ Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs 
  'udacity_delete_training_data_mutated0_MP_99',
  'udacity_unbalance_train_data_mutated0_MP_100']
 
-analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 81
-mutants killed on statistical killing approach: 81
-mutants not killed on statistical killing approach: 0
+analysing further on remaining mutants i.e # mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 81
+# mutants killed on statistical killing approach: 81
+# mutants not killed on statistical killing approach: 0
 
 
 Information on Comparison between model-level and system-level killing
