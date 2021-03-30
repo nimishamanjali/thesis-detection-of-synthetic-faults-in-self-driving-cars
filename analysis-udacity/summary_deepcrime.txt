@@ -99,6 +99,7 @@ analysing further on remaining mutants i.e mutants having crashes or OBEs on som
 mutants killed on statistical killing approach: 81
 mutants not killed on statistical killing approach: 0
 
+
 Information on Comparison between model-level and system-level killing
 % : mutant is killed on both model level and system level killing: 40.74
 % : mutant is not killed on both model level and system level killing: 0.0

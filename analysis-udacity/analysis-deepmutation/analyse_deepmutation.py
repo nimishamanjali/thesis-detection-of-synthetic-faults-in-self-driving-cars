@@ -2,14 +2,14 @@ import sys
 
 import pandas as pd
 
-from utilities_to_analyse_crashes_obes import extract_crashes_obes_data, extract_mutants_without_20_instances, \
-    lst_of_mutants_lacking_all_28_sectors, build_mutant_list_not_having_crashes_obes, \
-    build_mutant_list_having_crashes_obes_on_all_models, filter_some_from_all, \
-    build_mutant_list_having_crashes_obes_on_some_models
 from utilities import extract_data_based_given_mutant_list, compute_and_merge_killed_info_mutant_tables, \
     extract_original_model_data, filter_killed_mutants, get_metrics_info, \
     extract_minimal_metrics_that_kills_all_mutants, rank_metrics_in_terms_of_uniquity_of_killing, \
     extract_all_metrics_that_kills_a_mutant
+from utilities_to_analyse_crashes_obes import extract_crashes_obes_data, extract_mutants_without_20_instances, \
+    lst_of_mutants_lacking_all_28_sectors, build_mutant_list_not_having_crashes_obes, \
+    build_mutant_list_having_crashes_obes_on_all_models, filter_some_from_all, \
+    build_mutant_list_having_crashes_obes_on_some_models
 
 
 def compare_with_model_level(lst_of_mutant_names_to_modify, df, model_level_data):
@@ -80,7 +80,7 @@ def do_analysis(exclude_mutants_having_crashes_or_obes_on_all_from_some=True):
     metrics_info_for_no_crashes_obes = pd.DataFrame()
     killed_mutants_for_no_crashes_obes = pd.DataFrame()
     if not no_crashes_obes_list.empty:
-        df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list,'deepmutation')
+        df_no_crashes_obes = extract_data_based_given_mutant_list(sys.argv[1], no_crashes_obes_list, 'deepmutation')
         table_killed_info_of_mutants_for_no_crashes_obes = compute_and_merge_killed_info_mutant_tables(
             df_no_crashes_obes,
             org_model_data)
@@ -94,7 +94,7 @@ def do_analysis(exclude_mutants_having_crashes_or_obes_on_all_from_some=True):
         metrics_info_for_no_crashes_obes = get_metrics_info(killed_mutants_for_no_crashes_obes)
 
     ##some crashes or obes
-    if not exclude_mutants_having_crashes_or_obes_on_all_from_some:
+    if exclude_mutants_having_crashes_or_obes_on_all_from_some is False:
         some_crashes_obes_list = mutant_lst_with_crashes_or_obes_on_some_and_all_model
 
     metrics_info_for_some_crashes_obes = pd.DataFrame()
