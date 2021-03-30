@@ -2,7 +2,7 @@ import sys
 
 import pandas as pd
 
-from analyse_crashes_obes import extract_crashes_obes_data, extract_mutants_without_20_instances, \
+from utilities_to_analyse_crashes_obes import extract_crashes_obes_data, extract_mutants_without_20_instances, \
     lst_of_mutants_lacking_all_28_sectors, build_mutant_list_not_having_crashes_obes, \
     build_mutant_list_having_crashes_obes_on_all_models, filter_some_from_all, \
     build_mutant_list_having_crashes_obes_on_some_models

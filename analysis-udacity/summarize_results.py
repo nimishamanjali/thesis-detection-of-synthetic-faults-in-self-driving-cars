@@ -37,7 +37,7 @@ def get_all_mutants(path, mutation_tool):
 
 def summarize(mutation_tool):
     with open('summary_' + mutation_tool + '.txt', 'wt') as out:
-        all_mutants = get_all_mutants(sys.argv[1], mutation_tool)
+        all_mutants = get_all_mutants(sys.argv[2], mutation_tool)
         out.write("Total mutants: " + str(len(all_mutants)) + '\n\n')
         mutants_without_20_runs = \
             pd.read_csv(
@@ -176,4 +176,4 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise FileNotFoundError("Insert the correct path to the model-level data directory")
 
-    summarize(sys.argv[2])
+    summarize(sys.argv[1])
