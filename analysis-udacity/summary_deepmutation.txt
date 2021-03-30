@@ -1,0 +1,34 @@
+Total mutants: 24
+
+Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): 10
+['GF_0.05',
+ 'LA_0.01',
+ 'LD_0.03',
+ 'LD_0.05',
+ 'LR_0.01',
+ 'LR_0.03',
+ 'LR_0.05',
+ 'NAI_0.01',
+ 'NEB_0.03',
+ 'NS_0.03']
+
+Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs on all 20 model thus definitely has introduced a faulty behaviour: 0 mutants
+[]
+
+analysing further on remaining mutants i.e mutants having crashes or OBEs on some models,mutants not having crashes or OBEs: 10
+mutants killed on statistical killing approach: 10
+mutants not killed on statistical killing approach: 0
+
+
+Information on Comparison between model-level and system-level killing
+% : mutant is killed on both model level and system level killing: 20.00
+% : mutant is not killed on both model level and system level killing: 0.0
+
+Information on metrics
+Metrics which kills high number of mutants: ['Std(Acc)']
+The rank 1 metrics which kills mutations when all the other metrics can not kill it: ['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']
+
+killing ability percentages: 
+Model level killing(on remaining mutants not killed from Crashes/OBEs): 0.20
+Killed if crashes/OBEs on all model: 0.00
+Killed by statistical killing definition(on remaining mutants not killed from Crashes/OBEs): 1.00

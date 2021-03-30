@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from pprint import pprint
 
 import pandas as pd
@@ -13,7 +14,7 @@ pd.set_option('display.max_colwidth', None)
 metrics = get_all_metrics();
 
 
-def get_all_mutants(path):
+def get_all_mutants(path, mutation_tool):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
         dirs[:] = [d for d in dirs if not d.startswith('udacity_original')]
@@ -23,7 +24,10 @@ def get_all_mutants(path):
 
     filename = []
     for i in filenames:
-        filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
+        if mutation_tool == 'deepmutation':
+            filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[1:-1]))
+        if mutation_tool == 'deepcrime':
+            filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
 
     df = pd.DataFrame(
         {'mutation': filename})
@@ -32,13 +36,16 @@ def get_all_mutants(path):
 
 
 def summarize(mutation_tool):
-
-    with open('summary_'+mutation_tool+'.txt', 'wt') as out:
-        all_mutants = get_all_mutants(sys.argv[1])
+    with open('summary_' + mutation_tool + '.txt', 'wt') as out:
+        all_mutants = get_all_mutants(sys.argv[1], mutation_tool)
         out.write("Total mutants: " + str(len(all_mutants)) + '\n\n')
-        mutants_without_20_runs = pd.read_csv('analysis-'+mutation_tool+'/'+mutation_tool+'_results(csv)/mutants_lacking_20_models.csv')['mutants'].tolist()
+        mutants_without_20_runs = \
+            pd.read_csv(
+                'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/mutants_lacking_20_models.csv')[
+                'mutants'].tolist()
         mutants_without_28_sectors = pd.read_csv(
-           'analysis-'+mutation_tool+'/'+mutation_tool+'_results(csv)/mutants_lacking_28_sectors.csv')['mutants'].tolist()
+            'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/mutants_lacking_28_sectors.csv')[
+            'mutants'].tolist()
         mutants_analysed = [x for x in all_mutants if x not in (mutants_without_20_runs + mutants_without_28_sectors)]
         out.write('Mutants analysed(not considering mutants which miss 20 runs and 28 sectors): ' + str(
             len(mutants_analysed)) + '\n')
@@ -47,7 +54,8 @@ def summarize(mutation_tool):
 
         mutants_having_crashes_obes_on_all_model = \
             pd.read_csv(
-                'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')['mutation'].tolist()
+                'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')[
+                'mutation'].tolist()
 
         out.write(
             'Mutants killed already at level 1 i.e List of mutants that have crashes or OBEs on all 20 model thus definitely has introduced a faulty behaviour: ' + str(
@@ -62,10 +70,19 @@ def summarize(mutation_tool):
                 len(mutants_analysed) - len(mutants_having_crashes_obes_on_all_model)))
         mutants_for_stat_killing = [x for x in mutants_analysed if x not in mutants_having_crashes_obes_on_all_model]
         mutants_killed_by_stat_killing = []
-        df_mutants_killed_info = pd.concat([pd.read_csv(
-            'analysis-'+mutation_tool+'/'+mutation_tool+'_results(csv)/killed_info_of_mutants_for_no_crashes_obes.csv'),
-                                            pd.read_csv(
-                                                'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/killed_info_of_mutants_for_some_crashes_obes.csv')])
+        file_killed_info_csv_of_no_crashes = Path(
+            'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/killed_info_of_mutants_for_no_crashes_obes.csv')
+        file_killed_info_csv_of_some_crashes = Path(
+            'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/killed_info_of_mutants_for_some_crashes_obes.csv')
+
+        if not file_killed_info_csv_of_no_crashes.is_file():
+            df_mutants_killed_info = pd.read_csv(file_killed_info_csv_of_some_crashes)
+        elif not file_killed_info_csv_of_some_crashes.is_file():
+            df_mutants_killed_info = pd.read_csv(file_killed_info_csv_of_no_crashes)
+        else:
+            df_mutants_killed_info = pd.concat([pd.read_csv(file_killed_info_csv_of_no_crashes),
+                                                pd.read_csv(file_killed_info_csv_of_some_crashes)])
+
         for index, row in df_mutants_killed_info.iterrows():
             for i in metrics:
                 if 'killed: True' in row[i]:
@@ -81,15 +98,21 @@ def summarize(mutation_tool):
         if mutants_not_killed_by_stat >= 0:
             out.write('mutants not killed on statistical killing approach: ' + str(mutants_not_killed_by_stat
                                                                                    ))
-
+        out.write('\n')
         if (len(mutants_for_stat_killing) - len(mutants_killed_by_stat_killing)) != 0:
             pprint([x for x in mutants_for_stat_killing if x not in mutants_killed_by_stat_killing], stream=out)
-
-        df_comparison_model_system = pd.concat(
-            [pd.read_csv(
-                'analysis-'+mutation_tool+'/'+mutation_tool+'_results(csv)/Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv'),
-             pd.read_csv(
-                 'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')])
+        file_comparison_info_csv_of_no_crashes = Path(
+            'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/Comparison_with_model_level_of_mutants_for_no_crashes_obes.csv')
+        file_comparison_info_csv_of_some_crashes = Path(
+            'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/Comparison_with_model_level_of_mutants_for_some_crashes_obes.csv')
+        if not file_comparison_info_csv_of_no_crashes.is_file():
+            df_comparison_model_system = pd.read_csv(file_comparison_info_csv_of_some_crashes)
+        elif not file_comparison_info_csv_of_some_crashes.is_file():
+            df_comparison_model_system = pd.read_csv(file_comparison_info_csv_of_no_crashes)
+        else:
+            df_comparison_model_system = pd.concat(
+                [pd.read_csv(file_comparison_info_csv_of_no_crashes),
+                 pd.read_csv(file_comparison_info_csv_of_some_crashes)])
 
         killed_on_both_model = (len(df_comparison_model_system.loc[
                                         (df_comparison_model_system['killed atleast by one metric'] == 'Yes') & (
@@ -113,7 +136,9 @@ def summarize(mutation_tool):
             'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/metrics_info_on_how_many_mutants_they_kill.csv')
         highest_kill = metrics_data['Metric'].iloc[0]
         metrics_rank_data = \
-            pd.read_csv('analysis-'+mutation_tool+'/'+mutation_tool+'_results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')['Metrics'].iloc[0]
+            pd.read_csv(
+                'analysis-' + mutation_tool + '/' + mutation_tool + '_results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')[
+                'Metrics'].iloc[0]
 
         out.write('\n')
         out.write('\n')
@@ -130,6 +155,7 @@ def summarize(mutation_tool):
         model_level_data_killing_percent = len(
             df_comparison_model_system[df_comparison_model_system['Killed by model-level data'] == True]) / len(
             mutants_analysed)
+
         crash_obes_killing = len(mutants_having_crashes_obes_on_all_model) / len(mutants_analysed)
 
         stat_killing = len(mutants_killed_by_stat_killing) / len(mutants_analysed)
@@ -150,5 +176,4 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise FileNotFoundError("Insert the correct path to the model-level data directory")
 
-    summarize('deepcrime')
-
+    summarize(sys.argv[2])
