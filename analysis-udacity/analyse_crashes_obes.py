@@ -42,10 +42,10 @@ def build_mutant_list_having_crashes_obes_on_all_models(whole_df):
 
 
 # returns a df consisting crashes and obes data for all mutant models
-def extract_crashes_obes_data(path,name):
+def extract_crashes_obes_data(path, mutation_tool):
     filenames = []
     for root, dirs, files in os.walk(path + "/"):
-        dirs[:] = [d for d in dirs if not d.startswith('udacity_original')] #change
+        dirs[:] = [d for d in dirs if not d.startswith('udacity_original')]  # change
         for file in files:
             if file.endswith("driving_log_output.csv"):
                 filenames.append(os.path.join(root, file))
@@ -57,20 +57,20 @@ def extract_crashes_obes_data(path,name):
     for i in filenames:
         filtered_csv = pd.read_csv(i, usecols=['Crashes', 'OBEs'])
 
-
-        if(name=='deepmutation'):
-            filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[1:-1]))
-            extract_mutants_without_28_sectors('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[1:-1]),
+        if mutation_tool == 'deepmutation':
+            mutant_name = '_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[1:-1])
+            filename.append(mutant_name)
+            extract_mutants_without_28_sectors(mutant_name,
                                                filtered_csv)
-        if(name=='deepcrime'):
-            filename.append('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]))
-            extract_mutants_without_28_sectors('_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1]),
+        if mutation_tool == 'deepcrime':
+            mutant_name = '_'.join((os.path.splitext(i.split('/')[-2])[0]).split('_')[:-1])
+            filename.append(mutant_name)
+            extract_mutants_without_28_sectors(mutant_name,
                                                filtered_csv)
 
         crashes.append((filtered_csv.sum(axis=0)['Crashes']))
         obes.append((filtered_csv.sum(axis=0)['OBEs']))
         # print(os.path.splitext(i.split('/')[-2])[0])
-
 
     return pd.DataFrame(
         {'mutation': filename,
@@ -86,7 +86,6 @@ def filter_some_from_all(df1, df2):
 
 def extract_mutants_without_20_instances(df):
     df_instance_count = df.value_counts(subset=['mutation']).reset_index(name='counts')
-    # print(df_instance_count)
     return df_instance_count[df_instance_count.counts < 20]['mutation'].tolist()
 
 
@@ -95,31 +94,8 @@ def extract_mutants_without_28_sectors(filename, df):
         lst_of_mutants_lacking_all_28_sectors.append(filename)
 
 
-if __name__ == "__main__":
 
-    if len(sys.argv) < 2:
-        raise FileNotFoundError(
-            "Insert the correct path to the udacity data directory")
 
-    df = extract_crashes_obes_data(sys.argv[1],'deepcrime')
 
-    lst_of_mutants_lacking_20_runs = extract_mutants_without_20_instances(df)
-    pd.DataFrame(lst_of_mutants_lacking_20_runs, columns=['mutants']).to_csv(
-        'deepcrime_results(csv)/mutants_lacking_20_models.csv')
-    pd.DataFrame(list(set(lst_of_mutants_lacking_all_28_sectors)), columns=['mutants']).to_csv(
-        'deepcrime_results(csv)/mutants_lacking_28_sectors.csv')
-    df = df[~df['mutation'].isin(lst_of_mutants_lacking_20_runs + list(set(lst_of_mutants_lacking_all_28_sectors)))]
 
-    build_mutant_list_not_having_crashes_obes(df).to_csv('deepmutation_results(csv)/mutant_list_not_having_crashes_obes.csv')
-
-    mutant_lst_with_crashes_or_obes_on_all_model = build_mutant_list_having_crashes_obes_on_all_models(
-        df)  # mutants killed
-    mutant_lst_with_crashes_or_obes_on_all_model.to_csv(
-        'deepmutation_results(csv)/mutant_list_having_crashes_or_obes_on_all_models.csv')
-
-    mutant_lst_with_crashes_or_obes_on_some_and_all_model = build_mutant_list_having_crashes_obes_on_some_models(df)
-
-    filter_some_from_all(mutant_lst_with_crashes_or_obes_on_all_model,
-                         mutant_lst_with_crashes_or_obes_on_some_and_all_model).to_csv(
-        'deepmutation_results(csv)/mutant_list_having_crashes_or_obes_on_some_models.csv')
 
