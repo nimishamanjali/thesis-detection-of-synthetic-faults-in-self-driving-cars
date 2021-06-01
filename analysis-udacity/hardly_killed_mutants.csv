@@ -1,0 +1,11 @@
+,mutant,#metrics killed,metrics
+0,udacity_add_weights_regularisation_mutated0_MP_l2_3,6,"['Max(LP)', 'Max(Acc)', 'Std(SAS)', 'Std(LS)', 'Std(LP)', 'Max(Speed)']"
+1,udacity_change_epochs_mutated0_MP_50_38,8,"['Mean(LP)', 'Std(Speed)', 'Max(LP)', 'Max(Acc)', 'Std(LS)', 'Std(LP)', 'Mean(Acc)', 'Std(Acc)']"
+2,udacity_remove_bias_mutated0_MP_3,9,"['Max(LP)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(Acc)']"
+3,LR_0.01,10,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']"
+4,udacity_change_weights_initialisation_mutated0_MP_he_normal_3,10,"['Mean(LP)', 'Std(Speed)', 'Max(LP)', 'Max(Acc)', 'Mean(SAS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)']"
+5,udacity_make_output_classes_overlap_mutated0_MP_3.12,10,"['Std(SA)', 'Max(Acc)', 'Max(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Std(LP)', 'Mean(Acc)', 'Std(Acc)']"
+6,udacity_add_weights_regularisation_mutated0_MP_l1_3,11,"['Mean(LP)', 'Std(Speed)', 'Max(LP)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Mean(LS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Mean(TPP)']"
+7,LR_0.03,11,"['Std(Speed)', 'Max(Acc)', 'Mean(SA)', 'Mean(SAS)', 'Std(SAS)', 'Mean(LS)', 'Std(LS)', 'Max(Speed)', 'Min(Acc)', 'Std(Acc)', 'Mean(TPP)']"
+8,udacity_change_weights_initialisation_mutated0_MP_orthogonal_4,11,"['Mean(LP)', 'Std(SA)', 'Max(LP)', 'Max(Acc)', 'Mean(SAS)', 'Std(LS)', 'Min(LP)', 'Std(LP)', 'Max(Speed)', 'Mean(Acc)', 'Std(Acc)']"
+9,udacity_remove_activation_function_mutated0_MP_3,11,"['Std(Speed)', 'Std(SA)', 'Max(Acc)', 'Mean(SAS)', 'Std(SAS)', 'Std(LS)', 'Min(LP)', 'Max(Speed)', 'Mean(Acc)', 'Std(Acc)', 'Mean(TPP)']"
