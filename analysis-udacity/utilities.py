@@ -15,7 +15,7 @@ MEAN_LP = 'Mean(LP)'
 STD_SA = 'Std(SA)'
 MAX_LP = 'Max(LP)'
 MAX_ACC = 'Max(Acc)'
-MAX_SA = 'Max(SA)'
+MAX_SA = 'Max(SA)' 
 Mean_SA = 'Mean(SA)'
 Mean_SAS = 'Mean(SAS)'
 Std_SAS = 'Std(SAS)'
@@ -119,7 +119,7 @@ def compute_table_for_metric(org, x, metric):
         org_list = org[metric].tolist()
 
         effect_size = ([item for item in cc if item[0] == metric][0][1])
-        for i in range(0, 27):
+        for i in range(0, 28):
             data = is_diff_sts([item[i] for item in org_list], [item[i] for item in mutant_list], effect_size)
             if data[0]:
                 killed = 'killed: ' + str(data[0]) + ',' + 'Sector number: ' + str(i) + ',' + ' p_value: ' + str(
@@ -229,7 +229,9 @@ def extract_minimal_metrics_that_kills_all_mutants(whole_df):
         if not flat_list:
             break
 
+
     df_samples = df_info.loc[df_info['#mutants killed'].isin([x[1] for x in minimal])]
+
     for index, row in df_samples.iterrows():
         minimal.append((row[0], row[1]))
 

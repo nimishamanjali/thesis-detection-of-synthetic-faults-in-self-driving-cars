@@ -75,7 +75,6 @@ def do_analysis(exclude_mutants_having_crashes_or_obes_on_all_from_some=True):
 
     org_model_data = extract_original_model_data(sys.argv[2])
     model_level_data = pd.read_csv(sys.argv[3], usecols=['Prefix', 'Killed'])
-
     # no crashes or obes
     metrics_info_for_no_crashes_obes = pd.DataFrame()
     killed_mutants_for_no_crashes_obes = pd.DataFrame()
@@ -133,15 +132,15 @@ def do_analysis(exclude_mutants_having_crashes_or_obes_on_all_from_some=True):
             whole_df = killed_mutants_for_some_crashes_obes
         elif killed_mutants_for_some_crashes_obes.empty:
             whole_df = killed_mutants_for_no_crashes_obes
-        else:
-            whole_df = pd.concat(
-                [killed_mutants_for_no_crashes_obes, killed_mutants_for_some_crashes_obes]).reset_index(
-                drop=True)
-        extract_minimal_metrics_that_kills_all_mutants(whole_df).to_csv(
-            'deepmutation_results(csv)/minimal_set_of_metrics_that_kills_all_mutants')
+    # else:
+    whole_df = pd.concat(
+        [killed_mutants_for_no_crashes_obes, killed_mutants_for_some_crashes_obes]).reset_index(
+        drop=True)
+    extract_minimal_metrics_that_kills_all_mutants(whole_df).to_csv(
+        'deepmutation_results(csv)/minimal_set_of_metrics_that_kills_all_mutants')
 
-        rank_metrics_in_terms_of_uniquity_of_killing(whole_df).to_csv(
-            'deepmutation_results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')
+    rank_metrics_in_terms_of_uniquity_of_killing(whole_df).to_csv(
+        'deepmutation_results(csv)/ranking_of_metrics_based_on_uniquity_of_killing.csv')
 
     if not killed_mutants_for_no_crashes_obes.empty:
         df_a = extract_all_metrics_that_kills_a_mutant(killed_mutants_for_no_crashes_obes)
